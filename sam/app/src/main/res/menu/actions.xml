@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:sam="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_init_controls"
+        android:contentDescription="@string/uit_actions_init_controls"
+        android:title="@string/menu_init_controls" />
+    <item android:id="@+id/publish"
+        android:contentDescription="@string/uit_actions_publish"
+        android:title="@string/publish" />
+    <item android:id="@+id/subscribe"
+        android:contentDescription="@string/uit_actions_subscribe"
+        android:title="@string/subscribe" />
+    <!--<item android:id="@+id/cancelpublish"-->
+        <!--android:contentDescription="@string/uit_actions_publish_cancel"-->
+        <!--android:title="@string/cancelpublish" />-->
+    <!--<item android:id="@+id/cancelsubscribe"-->
+        <!--android:contentDescription="@string/uit_actions_subscribe_cancel"-->
+        <!--android:title="@string/cancelsubscribe" />-->
+    <item android:id="@+id/cancelinit"
+        android:contentDescription="@string/uit_actions_init_cancel"
+        android:title="@string/cancelinit" />
+    <item android:id="@+id/set_power_lvl"
+        android:contentDescription="@string/uit_actions_set_power_lvl"
+        android:title="@string/set_power_lvl" />
+</menu>

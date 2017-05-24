@@ -1,0 +1,5 @@
+<resources>
+
+    <integer name="max_handle_length">25</integer>
+
+</resources>

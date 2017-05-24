@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+def m87SdkDir = project.hasProperty('M87_SDK') ? M87_SDK + "/sdk" : "../.."
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '25.0.0'
+    defaultConfig {
+        applicationId "com.m87.sam"
+        minSdkVersion 17
+        targetSdkVersion 23
+        if (project.hasProperty('mdsVersionCode')) { versionCode = Integer.parseInt(project.mdsVersionCode) }
+        if (project.hasProperty('mdsVersionName')) { versionName = project.mdsVersionName }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    productFlavors {
+       sdk { buildConfigField "boolean", "isMwcBundled", "false" }
+    }
+    sourceSets { main { java.srcDirs = ['src/main/java', m87SdkDir + "/src"] } }
+
+    // This is handled for you by the 2.0+ Gradle Plugin
+    aaptOptions { additionalParameters "--no-version-vectors" }
+}
+
+repositories {flatDir {dirs (m87SdkDir + "/libs")}}
+
+dependencies {
+    sdkCompile 'com.m87.mwc:m87sdk:+@aar'
+
+    compile 'com.android.support:appcompat-v7:23.+'
+    compile 'com.android.support:design:+'
+}
+
+

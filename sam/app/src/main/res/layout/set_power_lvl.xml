@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:weightSum="1"
+              android:id="@+id/set_power_lvl"
+              android:orientation="vertical"
+              android:paddingLeft="@dimen/abc_dialog_padding_material"
+              android:paddingRight="@dimen/abc_dialog_padding_material"
+              android:paddingTop="@dimen/abc_dialog_padding_material">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/set_power_lvl_text"
+        android:inputType="number"
+        android:hint="Power level"/>
+
+</LinearLayout>

@@ -1,0 +1,54 @@
+<resources>
+
+    <!-- MWC GET parameter command names -->
+    <string-array name="mwc_get_command_names">
+        <item>Battery info</item>
+        <item>Percent CPU used</item>
+        <item>Cellular signal strength</item>
+        <item>Cellular network type</item>
+        <item>Cellular carrier</item>
+        <item>Cellular network operator name</item>
+        <item>Cellular basestation ID</item>
+    </string-array>
+
+    <!-- MWC commands (found in com.m87.infoservice.ProtocolThread) -->
+    <string-array name="mwc_get_command_commands">
+        <item>battery_info</item>
+        <item>percent_cpu_used</item>
+        <item>cellular_signal_strength</item>
+        <item>cellular_network_type</item>
+        <item>cellular_carrier</item>
+        <item>cellular_network_operator_name</item>
+        <item>cellular_base_station_id</item>
+    </string-array>
+    
+    <!--  Modifiable MWC parameters to be included in the default list -->
+    <string-array name="mwc_set_command_commands">
+        <item>base_station_id</item>
+        <item>battery</item>
+        <item>carrier_id</item>
+        <item>channel</item>
+        <item>cpu</item>
+        <item>frequency</item>
+        <item>local_ci_cqi</item>
+        <item>local_nci_cqi</item>
+        <item>power_source</item>
+        <item>network_operator</item>
+        <item>network_type</item>
+        <item>ssid</item>
+    </string-array>
+
+    <string-array name="transfer_duration">
+        <item>10s</item>
+        <item>30s</item>
+        <item>45s</item>
+        <item>60s</item>
+        <item>180s</item>
+    </string-array>
+    <string-array name="privacy_modes" >
+        <item>Public</item>
+        <item>Private</item>
+        <item>Hidden</item>
+    </string-array>
+
+</resources>

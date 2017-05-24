@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background= "@color/blue"
+    android:paddingTop="150dp"
+    android:paddingBottom="10dp">
+
+    <TextView
+        android:id="@+id/tv_project_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:textColor="@color/white"
+        android:textSize="36dp"
+        android:padding="5dp"
+        android:gravity="center"
+        android:text="@string/project_name" />
+
+    <TextView
+        android:id="@+id/tv_project_authors"
+        android:layout_below="@id/tv_project_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        android:padding="5dp"
+        android:gravity="center"
+        android:text="@string/authors" />
+
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:padding="5dp"
+        android:src="@drawable/utece" />
+
+</RelativeLayout>

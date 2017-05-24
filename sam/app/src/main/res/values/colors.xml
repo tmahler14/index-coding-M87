@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="m87_green">#87c54d</color>
+    <color name="m87_orange">#e8a044</color>
+    <color name="m87_red">#de4c50</color>
+    <color name="m87_white">#e6e5e6</color>
+    <color name="text_color">#aaacae</color>
+    <color name="horizontal_divider_color">#585555</color>
+    <color name="action_bar_line_color">#4b4b4a</color>
+    <color name="background_color">#403f3f</color>
+    <color name="tab_color">#373535</color>
+
+    <!--Color Palette-->
+    <color name="transparent">#00000000</color>
+
+    <!--White-->
+    <color name="white">#FFFFFDFD</color>
+
+    <!--Red-->
+    <color name="light_red">#FFFF3159</color>
+    <color name="red">#FFFF0033</color>
+
+    <!--Blue-->
+    <color name="light_blue">#FF669FD6</color>
+    <color name="blue">#50b3fa</color>
+    <color name="list_section_blue">#FF406680</color>
+
+    <!--Grey-->
+    <color name="bg_light_grey">#FFf1f5f7</color>
+    <color name="grey_input_border">#FFebebeb</color>
+    <color name="list_item_grey">#FF8c8c8c</color>
+    <color name="dark_grey">#FF606666</color>
+    <color name="block_grey">#FFbfbfbf</color>
+
+    <color name="grey">#FFC6C6C6</color>
+
+    <!--Green-->
+    <color name="green">#FF8ac442</color>
+    <color name="light_green">#FFADE26B</color>
+
+</resources>

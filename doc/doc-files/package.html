@@ -1,0 +1,79 @@
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<h3>M87 Proximity Software Development Kit (SDK)</h3>
+M87 Proximity SDK provides a means for Android application developers to leverage the M87 proximity discovery
+and connection technology running on a device. It consists of a single Java <b>aar</b> bundle named
+<code>m87-sdk-&lt;version>.aar</code>. The aar file needs to be added to the application's project. A set of
+step-by-step instructions is provided below.
+<p/>
+<h3>SAM</h3>
+Besides the SDK component, a sample application called <b>SAM</b> is distributed with source-code. SAM is a
+simple discovery and messaging demonstration that shows how to utilize the SDK. SAM can be installed using
+either the <code>adb</code> USB debugging tool or downloading the APK through an HTML link.
+<p/>
+<h3>Steps for Using M87 Proximity SDK</h3>
+Follow these steps to use M87 Proximity SDK in your Android application:
+<list>
+<ol>
+    <li>Add the SDK binary <code>m87-sdk-&lt;version>.aar</code> to your Android project by selecting
+    File->New Module->Import .jar/.aar package. Then browse to <code>m87-sdk-&lt;version>.aar</code> and
+    select it.
+    </li>
+
+    <li>In your main activity class, declare the ProximityManager object
+        <pre>
+            private ProximityManager mApi;
+        </pre>
+    </li>
+
+    <li>Implement the ProximityManager.Callbacks interface
+        <pre>
+            class MyAppCallbacks implements ProximityManager.Callbacks
+            {
+                ...
+                public void onMatch(...)
+                {
+                    // Proximity entry processing
+                    // etc.
+                }
+                ...
+            }
+        </pre>
+    </li>
+
+    <li>In your activity's <code>onCreate()</code> function, instantiate the ProximityManager object and
+    initialize it with your ProximityManager.Callbacks implementation
+        <pre>
+            public void onCreate()
+            {
+                ...
+                mApi = new ProximityManager(this, new MyAppCallbacks());
+                mApi.initialize(this);
+                ...
+            }
+        </pre>
+    </li>
+
+    <li>To start receiving proximity events and messages you must subscribe (and optionally publish).
+    This must be done when the SDK has indicated its successful initialization. Add the following code
+    inside your ProximityManager.Callbacks implementation.
+        <pre>
+            &#x40;Override
+            public void onInitialize(ProximityManager.Status.Initialize status, java.lang.String statusMessage)
+            {
+                if (status == ProximityManager.Status.Initialize.SUCCESS)
+                {
+                    Log.e("MyApp", "Successfully initialized SDK. Subscribing and publishing ...");
+                    mApi.subscribe(tidSubscribe, ttlSubscribe, expressionSubscribe, rangeSubscribe);
+                    mApi.publish(tidPublish, ttlPublish, expressionPublish, rangePublish, metaData);
+                }
+            }
+        </pre>
+    Note that <code>exprStr</code> used in the publish request must be an application-wide unique string.
+    </li>
+</ol>
+</body>
+</html>

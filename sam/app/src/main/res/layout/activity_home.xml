@@ -1,0 +1,33 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragment_container"
+    android:orientation="vertical" >
+
+    <!--Subscribe Init-->
+    <Button
+        android:id="@+id/button_init_subscribe"
+        style="@style/ButtonBlue"
+        android:background="@drawable/button_green"
+        android:text="@string/button_init_subscribe"
+        android:textColor="@color/white"/>
+
+    <!--Publish Init-->
+    <Button
+        android:id="@+id/button_init_publish"
+        style="@style/ButtonBlue"
+        android:background="@drawable/button_blue"
+        android:text="@string/button_init_publish"
+        android:visibility="gone"
+        android:textColor="@color/white"/>
+
+    <!--Test Init-->
+    <Button
+        android:id="@+id/button_init_test"
+        style="@style/ButtonBlue"
+        android:background="@drawable/button_blue"
+        android:text="@string/button_init_test"
+        android:visibility="gone"
+        android:textColor="@color/white"/>
+
+</LinearLayout>

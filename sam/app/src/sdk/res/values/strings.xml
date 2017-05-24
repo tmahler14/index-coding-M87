@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Index Coding</string>
+    <string name="project_name">Index Coding Demo</string>
+    <string name="authors">By Tim Mahler, Muryong Kim &amp; Yitao Chen</string>
+    <string name="action_settings">Settings</string>
+    <string name="ping_label">Ping</string>
+    <string name="publish">Publish</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="cancelpublish">Cancel Publish</string>
+    <string name="cancelsubscribe">Cancel Subscribe</string>
+    <string name="cancelinit">Cancel Init</string>
+    <string name="set_power_lvl">Power Level</string>
+    <string name="menu_init_controls">Init Controls</string>
+
+    <string name="title_neighbors">Neighbors</string>
+    <string name="title_config">Configuration</string>
+
+    <string name="header_handle">Handle</string>
+    <string name="header_hop_count">Strength</string>
+    <string name="table_expr_str">EXPR</string>
+    <string name="table_metadata">METADATA</string>
+    <string name="table_id">ID</string>
+    <string name="table_hops">RG</string>
+    <string name="table_met">MET</string>
+    <string name="table_conn">CONN</string>
+    <string name="table_bss">SS</string>
+    <string name="table_snr">SNR</string>
+    <string name="table_rxpower">RX Pwr</string>
+    <string name="table_state">State</string>
+
+    <string name="table_ttl">TTL</string>
+    <string name="table_metrics">Metrics</string>
+
+    <string name="config_label_handle">Handle:</string>
+    <string name="config_button_apply">Apply</string>
+    <string name="config_label_privacy">Privacy:</string>
+
+    <string name="acc_title">P2P Connection Monitor</string>
+    <string name="acc_msg">To enable M87 to accept peer connections automatically, you must enable the P2P Connection Monitor in the Accessibility Settings.</string>
+
+    <string name="init_title">M87 Initializing</string>
+    <string name="init_msg">Please wait while M87 initializes</string>
+
+    <string name="sdk_disabled_title">M87 SDK Disabled</string>
+    <string name="sdk_disabled_msg">M87 SDK is disabled</string>
+
+    <string name="confirm_exit">Do you really want to exit?</string>
+
+    <string name="sdk_install_title">M87 SDK</string>
+    <string name="sdk_install">The M87 SDK has not been installed. Would you like to install it?</string>
+
+    <string name="send_msg">Send Message</string>
+    <string name="send_bcast">Send Broadcast</string>
+    <string name="send_msg_id">Enter destination OTA ID</string>
+    <string name="send_msg_msg">Enter a short message</string>
+
+    <string name="set_expr_str">Set expression string</string>
+    <string name="cancel_pub">Cancel Publish</string>
+    <string name="cancel_sub">Cancel Subscribe</string>
+
+    <string name="rcv_msg">Message Received</string>
+    <string name="msg_ack">Message Acknowledged</string>
+
+    <string name="uit_neighbor_expr_str_cell">uit_neighbor_expr_str_cell</string>
+    <string name="uit_neighbor_metadata_cell">uit_neighbor_metadata_cell</string>
+    <string name="uit_neighbor_id_cell">uit_neighbor_id_cell</string>
+    <string name="uit_neighbor_hops_cell">uit_neighbor_hops_cell</string>
+    <string name="uit_neighbor_met_cell">uit_neighbor_met_cell</string>
+    <string name="uit_neighbor_conn_cell">uit_neighbor_conn_cell</string>
+    <string name="uit_actions_send_msg">uit_actions_send_msg</string>
+    <string name="uit_actions_publish">uit_actions_publish</string>
+    <string name="uit_actions_subscribe">uit_actions_subscribe</string>
+    <string name="uit_actions_publish_cancel">uit_actions_publish_cancel</string>
+    <string name="uit_actions_subscribe_cancel">uit_actions_subscribe_cancel</string>
+    <string name="uit_actions_init_cancel">uit_actions_init_cancel</string>
+    <string name="uit_actions_set_power_lvl">uit_actions_set_power_lvl</string>
+    <string name="uit_actions_init_controls">uit_actions_init_controls</string>
+
+
+    <!--Buttons-->
+    <string name="button_init_subscribe">1.) Init Subscribe</string>
+    <string name="button_init_publish">2.) Init Publish</string>
+    <string name="button_init_test">3.) Test Publish</string>
+
+    <!-- Control Panel -->
+    <string name="tv_control_device_type">Device Type:</string>
+    <string name="tv_control_algorithm_type">Algorithm:</string>
+    <string name="radio_transmitter">Transmitter</string>
+    <string name="radio_receiver">Receiver</string>
+    <string name="radio_greedy">Greedy</string>
+    <string name="radio_clique">Clique</string>
+    <string name="tv_control_drop_probability">Receive Probability (0-1):</string>
+    <string name="et_control_drop_probability_hint">ex: 0.5</string>
+    <string name="tv_num_tests"># Of Tests:</string>
+    <string name="et_control_num_tests_hint">ex: 10</string>
+    <string name="bt_control_init_button">Init Test</string>
+
+</resources>
