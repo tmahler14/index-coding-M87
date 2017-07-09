@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">Index Coding</string>
+    <string name="api_key">1XtuSi3zuK4o89psPizexanHEUfkjSRLaKrKOL1S</string>
     <string name="project_name">Index Coding Demo</string>
     <string name="authors">By Tim Mahler, Muryong Kim &amp; Yitao Chen</string>
     <string name="action_settings">Settings</string>
@@ -29,6 +30,8 @@
     <string name="table_snr">SNR</string>
     <string name="table_rxpower">RX Pwr</string>
     <string name="table_state">State</string>
+    <string name="table_rat">RAT</string>
+    <string name="table_acpt_msg">MSG</string>
 
     <string name="table_ttl">TTL</string>
     <string name="table_metrics">Metrics</string>
@@ -38,7 +41,7 @@
     <string name="config_label_privacy">Privacy:</string>
 
     <string name="acc_title">P2P Connection Monitor</string>
-    <string name="acc_msg">To enable M87 to accept peer connections automatically, you must enable the P2P Connection Monitor in the Accessibility Settings.</string>
+    <string name="acc_msg">To enable Messaging feature, you must enable the %s in the Accessibility Settings.</string>
 
     <string name="init_title">M87 Initializing</string>
     <string name="init_msg">Please wait while M87 initializes</string>
@@ -50,6 +53,9 @@
 
     <string name="sdk_install_title">M87 SDK</string>
     <string name="sdk_install">The M87 SDK has not been installed. Would you like to install it?</string>
+
+    <string name="sdk_update_title">M87 SDK</string>
+    <string name="sdk_update">The M87 SDK update is required. Would you like to update it?</string>
 
     <string name="send_msg">Send Message</string>
     <string name="send_bcast">Send Broadcast</string>
@@ -80,9 +86,9 @@
 
 
     <!--Buttons-->
-    <string name="button_init_subscribe">1.) Init Subscribe</string>
-    <string name="button_init_publish">2.) Init Publish</string>
-    <string name="button_init_test">3.) Test Publish</string>
+    <string name="button_init_publish">1.) Init Publish</string>
+    <string name="button_init_subscribe">2.) Init Subscribe</string>
+    <string name="button_init_test">Start Test</string>
 
     <!-- Control Panel -->
     <string name="tv_control_device_type">Device Type:</string>
@@ -95,6 +101,20 @@
     <string name="et_control_drop_probability_hint">ex: 0.5</string>
     <string name="tv_num_tests"># Of Tests:</string>
     <string name="et_control_num_tests_hint">ex: 10</string>
-    <string name="bt_control_init_button">Init Test</string>
+    <string name="bt_control_init_button">Save Settings</string>
+
+    <!--Test Dialog-->
+    <string name="set_test_str">Set test params</string>
+    <string name="test_dialog_num_tests">Num Tests</string>
+    <string name="radio_control_test_store_yes">Yes</string>
+    <string name="radio_control_test_store_no">No</string>
+    <string name="tv_test_str_store_results">Store Results?</string>
+    <string name="tv_test_str_use_ic">Use Index Coding?</string>
+    <string name="radio_control_test_use_ic_yes">Yes</string>
+    <string name="radio_control_test_use_ic_no">No</string>
+
+    <string name="tv_test_str_test_type">Test Type:</string>
+    <string name="radio_control_test_type_basic">Basic</string>
+    <string name="radio_control_test_type_demo">Final Demo</string>
 
 </resources>

@@ -19,7 +19,7 @@ import android.view.MenuItem;
  */
 public abstract class BaseActivity extends ActionBarActivity
 {
-   @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -32,7 +32,7 @@ public abstract class BaseActivity extends ActionBarActivity
         switch (item.getItemId())
         {
             case android.R.id.home:
-                if (this instanceof Sam) return false;
+                if (this instanceof BaseActivity) return false;
                 NavUtils.navigateUpFromSameTask(this);
                 return true;
             default:

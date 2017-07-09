@@ -18,7 +18,16 @@ public class Controls {
     // Algo type
     //  - 0: greedy
     //  - 1: clique
-    public int algoType;
+    public int algoType = 0;
+
+    // Test type
+    //  - 0: basic
+    //  - 1: final demo
+    public int testType = 0;
+
+    public Boolean useIndexCoding = true;   // true if use index coding
+
+    public Boolean sendResults = false; // true if send results to server
 
     public static final String serialNumber = Build.SERIAL;
 
@@ -52,6 +61,7 @@ public class Controls {
 
     public String deviceId;
     public String publishMessage;
+    public String subscribeMessage;
 
     // Control instance
     public static Controls getInstance() {
@@ -59,6 +69,36 @@ public class Controls {
             instance = new Controls();
         }
         return instance;
+    }
+
+    public Controls() {
+        subscribeMessage = SUBSCRIBE_CHANNEL;
+        switch (serialNumber) {
+            case TX1_SERIAL:
+                publishMessage = TX1_PUBLISH;
+                isTransmitter = true;
+                break;
+            case RX1_SERIAL:
+                publishMessage = RX1_PUBLISH;
+                isTransmitter = false;
+                break;
+            case RX2_SERIAL:
+                publishMessage = RX2_PUBLISH;
+                isTransmitter = false;
+                break;
+            case RX3_SERIAL:
+                publishMessage = RX3_PUBLISH;
+                isTransmitter = false;
+                break;
+            case RX4_SERIAL:
+                publishMessage = RX4_PUBLISH;
+                isTransmitter = false;
+                break;
+            case RX5_SERIAL:
+                publishMessage = RX5_PUBLISH;
+                isTransmitter = false;
+                break;
+        }
     }
 
     // Getter and setters
@@ -92,5 +132,29 @@ public class Controls {
 
     public void setAlgoType(int algoType) {
         this.algoType = algoType;
+    }
+
+    public Boolean getUseIndexCoding() {
+        return useIndexCoding;
+    }
+
+    public void setUseIndexCoding(Boolean useIndexCoding) {
+        this.useIndexCoding = useIndexCoding;
+    }
+
+    public int getTestType() {
+        return testType;
+    }
+
+    public void setTestType(int testType) {
+        this.testType = testType;
+    }
+
+    public Boolean getSendResults() {
+        return sendResults;
+    }
+
+    public void setSendResults(Boolean sendResults) {
+        this.sendResults = sendResults;
     }
 }

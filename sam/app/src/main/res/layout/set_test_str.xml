@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:id="@+id/set_expr_str"
+    android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp">
+
+    <!--Num of consecutive tests-->
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/set_test_str_num_test"
+        android:hint="@string/test_dialog_num_tests"/>
+
+    <!--Test Type-->
+    <TextView
+        android:id="@+id/tv_test_str_test_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tv_test_str_use_ic"
+        android:textSize="16dp"
+        android:textColor="@color/dark_grey"
+        android:gravity="left"
+        android:layout_marginBottom="2.5dp"
+        android:layout_marginTop="10dp"
+        />
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/radio_group_test_test_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="0dp"
+        android:buttonTint="@color/blue"
+        android:textSize="16dp"
+        android:gravity="center">
+
+        <RadioButton android:id="@+id/radio_control_test_type_basic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radio_control_test_type_basic"
+            android:buttonTint="@color/blue"
+            android:textColor="@color/dark_grey"
+            android:textSize="16dp"
+            android:onClick="onRadioButtonClicked"
+            android:layout_marginRight="10dp"/>
+
+        <RadioButton android:id="@+id/radio_control_test_type_demo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radio_control_test_type_demo"
+            android:buttonTint="@color/blue"
+            android:textColor="@color/dark_grey"
+            android:textSize="16dp"
+            android:onClick="onRadioButtonClicked"/>
+
+    </RadioGroup>
+
+
+    <!--Use Index Coding? -->
+    <TextView
+        android:id="@+id/tv_test_str_use_ic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tv_test_str_use_ic"
+        android:textSize="16dp"
+        android:textColor="@color/dark_grey"
+        android:gravity="left"
+        android:layout_marginBottom="2.5dp"
+        android:layout_marginTop="10dp"
+        />
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/radio_group_test_use_ic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="0dp"
+        android:buttonTint="@color/blue"
+        android:textSize="16dp"
+        android:gravity="center">
+
+        <RadioButton android:id="@+id/radio_control_test_use_ic_yes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radio_control_test_use_ic_yes"
+            android:buttonTint="@color/blue"
+            android:textColor="@color/dark_grey"
+            android:textSize="16dp"
+            android:onClick="onRadioButtonClicked"
+            android:layout_marginRight="10dp"/>
+
+        <RadioButton android:id="@+id/radio_control_test_use_ic_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radio_control_test_use_ic_no"
+            android:buttonTint="@color/blue"
+            android:textColor="@color/dark_grey"
+            android:textSize="16dp"
+            android:onClick="onRadioButtonClicked"/>
+
+    </RadioGroup>
+
+    <!--Store Results-->
+    <TextView
+        android:id="@+id/tv_test_str_store_results"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tv_test_str_store_results"
+        android:textSize="16dp"
+        android:textColor="@color/dark_grey"
+        android:gravity="left"
+        android:layout_marginBottom="2.5dp"
+        android:layout_marginTop="10dp"
+        />
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/radio_group_test_store_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="0dp"
+        android:buttonTint="@color/blue"
+        android:textSize="16dp"
+        android:gravity="center">
+
+        <RadioButton android:id="@+id/radio_control_test_store_yes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radio_control_test_store_yes"
+            android:buttonTint="@color/blue"
+            android:textColor="@color/dark_grey"
+            android:textSize="16dp"
+            android:onClick="onRadioButtonClicked"
+            android:layout_marginRight="10dp"/>
+
+        <RadioButton android:id="@+id/radio_control_test_store_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radio_control_test_store_no"
+            android:buttonTint="@color/blue"
+            android:textColor="@color/dark_grey"
+            android:textSize="16dp"
+            android:onClick="onRadioButtonClicked"/>
+
+    </RadioGroup>
+
+
+</LinearLayout>

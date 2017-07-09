@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -30,12 +31,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.m87.sam.BuildConfig;
 import com.m87.sam.R;
 import com.m87.sam.ui.fragment.NeighborsFragment;
+import com.m87.sam.ui.pojos.ChatMessage;
+import com.m87.sam.ui.pojos.IndexCodingMessage;
 import com.m87.sam.ui.util.Controls;
 import com.m87.sam.ui.util.Logger;
 import com.m87.sdk.ProximityConfig;
@@ -75,6 +79,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private ProximityManager mApi;
 
+    private TestFragment mTestFragment;
     private HomeFragment mHomeFragment;
     private MessageFragment mMessageFragment;
 
@@ -98,13 +103,15 @@ public class HomeActivity extends AppCompatActivity {
     //**************************************************************************************************
     // Private classes
     //--------------------------------------------------------------------------------------------------
-    private class SamCallbacks implements ProximityManager.Callbacks {
+    private class SamCallbacks extends ProximityManager.Callbacks {
         @Override
         public void onInitialize(int status, String statusMessage)
         {
             if (status == ProximityManager.InitializeStatus.SUCCESS)
             {
                 Logger.debug("Successfully initialized SDK");
+//                NeighborsFragment.neighborList.clear();
+//                NeighborsFragment f = getNeighboursFragment();
                 if (m87InitDialog != null)
                 {
                     m87InitDialog.cancel();
@@ -130,6 +137,7 @@ public class HomeActivity extends AppCompatActivity {
          * @param status
          * @param statusMessage
          */
+        @Override
         public void onInstall(int status, String statusMessage) {
             if (status == ProximityManager.InstallStatus.SUCCESS)
             {
@@ -148,23 +156,22 @@ public class HomeActivity extends AppCompatActivity {
         {
         }
 
+        @Override
         public void onEvent(ProximityEvent event) {
             Logger.debug("Event: code(" + event.getCode() + "), status(" + event.getStatus() + ")");
             int code = event.getCode();
             int status = event.getStatus();
 
-            if (code == EventCode.CONFIG)
-            {
-                if (status == EventStatus.CONFIG_ACCESSIBILITY)
-                {
-                    if (! isAccessibilityOn()) goToAccessibilitySettings();
-                }
-            }
-            else if (code == EventCode.MWC_STATE)
+            if (code == EventCode.MWC_STATE)
             {
                 if (status == EventStatus.MWC_STATE_ENABLED)
                 {
-                    Logger.debug("SDK has resumed");
+//                    SAM_DEBUG("SDK has resumed");
+//                    NeighborsFragment.neighborList.clear();
+//                    NeighborsFragment f = getNeighboursFragment();
+//                    if (f != null) {
+//                        f.display();
+//                    }
                     if (m87SdkDisabledDialog != null)
                     {
                         m87SdkDisabledDialog.cancel();
@@ -173,8 +180,12 @@ public class HomeActivity extends AppCompatActivity {
                 }
                 else if (status == EventStatus.MWC_STATE_DISABLED)
                 {
-                    Logger.debug("SDK has stopped");
-                    NeighborsFragment.neighborList.clear();
+//                    SAM_DEBUG("SDK has stopped");
+//                    NeighborsFragment.neighborList.clear();
+//                    NeighborsFragment f = getNeighboursFragment();
+//                    if (f != null) {
+//                        f.display();
+//                    }
                     if (m87InstallDialog == null) waitForSdkEnable();
                 }
             }
@@ -196,6 +207,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
 
+        @Override
         public void onMatch(java.lang.String subscribeExpression, ProximityEntry entry, int matchState)
         {
             if (entry == null)
@@ -204,7 +216,7 @@ public class HomeActivity extends AppCompatActivity {
                 return;
             }
 
-            Logger.debug("MATCH! : with ="+entry.getId()+ " msg : "+subscribeExpression+" metadata : "+entry.getMetaData());
+            Logger.debug("MATCH! : with ="+entry.getId()+ " msg : "+subscribeExpression+" metadata : "+entry.getMetaData()+", expression:"+entry.getExpression());
             String op = "Ignoring";
             switch (matchState)
             {
@@ -213,8 +225,8 @@ public class HomeActivity extends AppCompatActivity {
 
                     // Add to neighbor array
                     if (entry.isSelf()) mSelfProximityEntryId = entry.getId();
-                    NeighborsFragment.neighborList.add(entry);
-                    NeighborsFragment.neighborListAdapter.notifyDataSetChanged();
+
+                    addProximityEvent(entry);
 
                     // If the transmitter, then send init message
                     if (!customControls.isTransmitter && entry.getExpression().contains("TX")) {
@@ -224,7 +236,7 @@ public class HomeActivity extends AppCompatActivity {
                     break;
                 case ProximityManager.MatchState.UPDATE:
                     op = "Updating";
-                    for (ProximityEntry n : NeighborsFragment.neighborList)
+                    for (ProximityEntry n : HomeFragment.neighborList)
                     {
                         if (n.getId() == entry.getId())
                         {
@@ -235,7 +247,7 @@ public class HomeActivity extends AppCompatActivity {
                     break;
                 case ProximityManager.MatchState.DELETE:
                     op = "Deleting";
-                    Iterator<ProximityEntry> it = NeighborsFragment.neighborList.iterator();
+                    Iterator<ProximityEntry> it = HomeFragment.neighborList.iterator();
                     while (it.hasNext())
                     {
                         ProximityEntry n = it.next();
@@ -250,11 +262,12 @@ public class HomeActivity extends AppCompatActivity {
             }
 
             Logger.debug("subExpr(%s) %s Entry : id (%d) expression(%s) metaData(%s) range(%d) metrics(%d) rssi(%d), connStatus(%d)",
-                    subscribeExpression, op, entry.getId(), entry.getExpression(), entry.getMetaData(), entry.getHopCount(), entry.getMetrics(), entry.getRssi(), entry.getConnStatus());
+                    subscribeExpression, op, entry.getId(), entry.getExpression(), entry.getMetaData(), entry.getHopCount(), entry.getMetrics(), entry.getRssi(), entry.getConnectionStatus());
 
         }
 
-        public void onReceiveDirectMessage(ProximityMessage obj)
+        @Override
+        public void onReceiveMessage(ProximityMessage obj)
         {
             if (obj == null)
             {
@@ -268,16 +281,23 @@ public class HomeActivity extends AppCompatActivity {
             Toast msg = Toast.makeText(getApplicationContext(), "Msg received: "+obj.getMessage(), Toast.LENGTH_LONG);
             msg.show();
 
+            addChatMessage(new ChatMessage(obj.getSourceProximityEntryId(), obj.getDestinationProximityEntryId(), obj.getMessage(), true));
+
+
             //displayMessageReceived(obj);
         }
 
-        public void onSendDirectMessage(int transactionId, ProximityMessage message,
+        @Override
+        public void onSendMessage(int transactionId, ProximityMessage message,
                                         int status, java.lang.String statusMessage)
         {
             Logger.debug("tid(" + transactionId + ") Message(" + message.getMessage() + ") Send Direct Message status: " + status);
-            if (status == ProximityManager.SendDirectMessageStatus.SUCCESS_ACKED)
+            if (status == ProximityManager.SendMessageStatus.SUCCESS)
             {
                 ProximityMessage proxMsg = msgList.get(transactionId);
+
+                addChatMessage(new ChatMessage(message.getSourceProximityEntryId(), message.getDestinationProximityEntryId(), message.getMessage(), false));
+
                 if (proxMsg != null)
                 {
                     Toast msg = Toast.makeText(getApplicationContext(), "Receieved Ack from "+proxMsg.getSourceProximityEntryId(), Toast.LENGTH_LONG);
@@ -286,9 +306,14 @@ public class HomeActivity extends AppCompatActivity {
                     msgList.delete(transactionId);
                 }
             }
-            if (status != ProximityManager.SendDirectMessageStatus.SUCCESS &&
-                    status != ProximityManager.SendDirectMessageStatus.SUCCESS_ACKED &&
-                    !isFinishing()) {
+            else if (status == ProximityManager.SendMessageStatus.FAILURE_CONN_MONITOR_OFF  && !isFinishing()) {
+                // This is likely user turned off the CONNECTION MONITOR after the initial setup.
+                // Application has to prompt user to turn it on again, and potentially retry failed
+                // messages.
+                if (!isConnectionMonitorOn()) {
+                    setUpConnectionMonitor();
+                }
+            } else if (status != ProximityManager.SendMessageStatus.SUCCESS && !isFinishing()) {
 //                AlertDialog.Builder builder = new AlertDialog.Builder(Sam.this);
 //                builder.setTitle("Send Direct Message Status").setMessage(status.name());
 //                final AlertDialog dialog = builder.create();
@@ -296,22 +321,32 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
 
+        @Override
         public void onPublish(int transactionId, java.lang.String expression,
                               int status, java.lang.String statusMessage) {
             Logger.debug("tid(" + transactionId + ") Expr (" + expression + ") Publish status: " + status);
-
-            if (status != ProximityManager.PublishStatus.SUCCESS && !isFinishing()) {
+            if (status == ProximityManager.PublishStatus.FAILURE_CONN_MONITOR_OFF && !isFinishing()) {
+                // This is likely user turned off the CONNECTION MONITOR after the initial setup.
+                // Application has to prompt user to turn it on again, and potentially retry failed
+                // publish.
+                if (!isConnectionMonitorOn()) {
+                    setUpConnectionMonitor();
+                }
+            }
+            else if (status != ProximityManager.PublishStatus.SUCCESS && !isFinishing()) {
                 Toast msg = Toast.makeText(getApplicationContext(), "Published failed!", Toast.LENGTH_LONG);
                 msg.show();
             }
         }
 
+        @Override
         public void onSubscribe(int transactionId, java.lang.String expression,
                                 int status, java.lang.String statusMessage)
         {
             Logger.debug("tid(" + transactionId + ") Expr(" + expression + ") Subscribe status: " + status);
             if (status != ProximityManager.SubscribeStatus.SUCCESS && !isFinishing())
             {
+                Logger.debug("Successfully subscribed");
                 AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
                 builder.setTitle("Subscribe Status").setMessage("Error code " + status
                         + "\nError msg: " + statusMessage);
@@ -320,6 +355,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
 
+        @Override
         public void onCancelPublish(int tid, int status, java.lang.String statusMessage)
         {
             Logger.debug("tid(" + tid + ") Publish cancel status: " + status);
@@ -333,6 +369,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
 
+        @Override
         public void onCancelSubscribe(int tid, int status, java.lang.String statusMessage)
         {
             Logger.debug("tid(" + tid + ") Subscribe cancel status: " + status);
@@ -359,7 +396,7 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onConfigStatus(ProximityConfig configInEffect, int status, String statusMessage)
+        public void onConfig(ProximityConfig configInEffect, int status, String statusMessage)
         {
             Logger.debug("Config Status: %d, message: %s", status, statusMessage);
             mPowerLevel = configInEffect.getPowerLevel();
@@ -483,7 +520,7 @@ public class HomeActivity extends AppCompatActivity {
      */
     private void showInstallDialog(boolean isUpdate) {
         // Create a dialog to wait for installation
-        AlertDialog.Builder builder = new AlertDialog.Builder(Sam.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
         builder.setMessage(isUpdate? R.string.sdk_update: R.string.sdk_install)
                 .setTitle(isUpdate? R.string.sdk_update_title: R.string.sdk_install_title)
                 .setCancelable(false);
@@ -507,41 +544,78 @@ public class HomeActivity extends AppCompatActivity {
     };
 
     /**
-     * Loads in the M87 library
-     *
-     * @return true if the library is installed
-     */
-    private boolean loadM87()
-    {
-        mApi = new ProximityManager(this, new HomeActivity.SamCallbacks());
-
-        if (! BuildConfig.isMwcBundled)
-        {
-            // If the M87 SDK is already installed do nothing
-            if (mApi.isInstalled()) return true;
-            else {
-                // Else install the M87 lib
-                showInstallDialog();
-                return false;
-            }
-        }
-        return true;
-    };
-
-    /**
      * Start the M87 library
      */
-    private void startM87() {
-        // Give the user the option of enabling the accessibility setting
-        if (! isAccessibilityOn() && !mNoAccessibility) goToAccessibilitySettings();
+    private void startM87()
+    {
 
-        // Bring up the initializing dialog box
         waitForInit();
 
-        // Init the mApi proximity manager
-        if (BuildConfig.isMwcBundled) mApi.initialize("com.m87.sam");
-        else                          mApi.initialize(this);
-    };
+        if (mApi == null) {
+            mApi = new ProximityManager(this, new HomeActivity.SamCallbacks());
+        }
+        int r = mApi.initialize(getString(R.string.api_key));
+
+        if (r != ProximityManager.SUCCESS) {
+            handleSyncError(r);
+        }
+    }
+
+    private void handleSyncError(int code)
+    {
+        String err;
+        switch (code)
+        {
+            case ProximityManager.FAILURE_NOT_INITIALIZED:
+                err = "FAILURE_NOT_INITIALIZED";
+                break;
+            case ProximityManager.FAILURE_UNAVAILABLE:
+                err = "FAILURE_UNAVAILABLE";
+                break;
+            case ProximityManager.FAILURE_NOT_INSTALLED:
+                err = "FAILURE_NOT_INSTALLED";
+                break;
+            case ProximityManager.FAILURE_UPDATE_REQUIRED:
+                err = "FAILURE_UPDATE_REQUIRED";
+                break;
+            default:
+                return;
+        }
+
+        Toast toast = Toast.makeText(HomeActivity.this, "Handling " + err, Toast.LENGTH_LONG);
+        toast.show();
+
+        switch (code)
+        {
+            case ProximityManager.FAILURE_NOT_INITIALIZED:
+                // should never happen, since we always call initialize first
+                //
+            case ProximityManager.FAILURE_UNAVAILABLE:
+                // Connection to MWC service has failed, we can either wait for
+                // MWC service to come back, or try re-initialize it on demand.
+                //
+                Runnable r = new Runnable() {
+                    public void run() {
+                        startM87();
+                    }
+                };
+                Handler h = new Handler();
+                h.postDelayed(r, 5000);
+                break;
+            case ProximityManager.FAILURE_NOT_INSTALLED:
+                // MWC is not installed, prompt user to install MWC
+                //
+                showInstallDialog(false);
+                break;
+            case ProximityManager.FAILURE_UPDATE_REQUIRED:
+                // MWC version is too low, update is required, prompt user
+                //
+                showInstallDialog(true);
+                break;
+            default:
+                break;
+        }
+    }
 
     /**
      * Check if M87 accessibility service is enabled
@@ -610,6 +684,27 @@ public class HomeActivity extends AppCompatActivity {
         });
     };
 
+    // Prompt user to turn on P2P Connection Monitor setting, in order to allow M87 to
+    // automatically accept peer connections for direct messages
+    public void setUpConnectionMonitor() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+        String label = mApi.getConnectionMonitorName();
+        String msg = getString(R.string.acc_msg, label);
+        builder.setMessage(msg).setTitle(R.string.acc_title).setCancelable(false);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mApi.setUpConnectionMonitor();
+            }
+        }).create().show();
+    }
+
+    public boolean isConnectionMonitorOn() {
+        return mApi.isConnectionMonitorOn();
+    }
+
+
     /**
      * Show the "M87 initializing" dialog
      */
@@ -664,43 +759,6 @@ public class HomeActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void getPowerLvl()
-    {
-        View view = getLayoutInflater().inflate(R.layout.set_power_lvl, null);
-        final EditText input = (EditText) view.findViewById(R.id.set_power_lvl_text);
-
-        new AlertDialog.Builder(HomeActivity.this)
-                .setTitle("Set power level (current: " + mApi.getPowerLevel() + ")")
-                .setView(view)
-                .setPositiveButton(android.R.string.ok,
-                        new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                String lvlStr = input.getText().toString();
-                                if (lvlStr.length() == 0) return;
-                                int lvl = Integer.valueOf(lvlStr);
-                                if (mApi.setPowerLevel(lvl) != 0)
-                                {
-                                    Toast toast = Toast.makeText(HomeActivity.this, "Power level out of range!", Toast.LENGTH_SHORT);
-                                    toast.show();
-                                }
-                                dialog.dismiss();
-                            }
-                        })
-                .setNegativeButton(android.R.string.cancel,
-                        new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                dialog.cancel();
-                            }
-                        })
-                .create()
-                .show();
-    }
 
     private void getExpressionStringPublish()
     {
@@ -730,8 +788,8 @@ public class HomeActivity extends AppCompatActivity {
                                 {
                                     try
                                     {
-                                        int range = Integer.valueOf(rangeStr);
-                                        mApi.publish(TID_PUBLISH, exprStr, range, metadata);
+                                        int r = mApi.publish(TID_PUBLISH, exprStr, metadata, true);
+                                        if (r != 0) handleSyncError(r);
 
                                         Toast toast = Toast.makeText(HomeActivity.this, "Successfully published to: "+exprStr, Toast.LENGTH_SHORT);
                                         toast.show();
@@ -779,7 +837,8 @@ public class HomeActivity extends AppCompatActivity {
                                 }
                                 else
                                 {
-                                    mApi.cancelPublish(TID_PUBLISH_CANCEL, exprStr);
+                                    int r = mApi.cancelPublish(TID_PUBLISH_CANCEL, exprStr);
+                                    if (r != 0) handleSyncError(r);
                                 }
                                 dialog.dismiss();
                             }
@@ -823,8 +882,8 @@ public class HomeActivity extends AppCompatActivity {
                                 {
                                     try
                                     {
-                                        int range = Integer.valueOf(rangeStr);
-                                        mApi.subscribe(TID_SUBSCRIBE, exprStr, range);
+                                        int r = mApi.subscribe(TID_SUBSCRIBE, exprStr);
+                                        if (r != 0) handleSyncError(r);
                                     }
                                     catch (Exception e)
                                     {
@@ -903,9 +962,9 @@ public class HomeActivity extends AppCompatActivity {
         final TextView dst = (TextView) dm.findViewById(R.id.rcv_msg_dst);
         final TextView msg = (TextView) dm.findViewById(R.id.rcv_msg_msg);
 
-        src.setText(mHomeFragment.findExpressionById(entry.sourceProximityEntryId()));
-        dst.setText(mHomeFragment.findExpressionById(entry.destinationProximityEntryId()));
-        msg.setText(entry.message());
+        src.setText(mHomeFragment.findExpressionById(entry.getSourceProximityEntryId()));
+        dst.setText(mHomeFragment.findExpressionById(entry.getDestinationProximityEntryId()));
+        msg.setText(entry.getMessage());
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
         {
@@ -931,9 +990,9 @@ public class HomeActivity extends AppCompatActivity {
         final TextView dst = (TextView) dm.findViewById(R.id.rcv_msg_dst);
         final TextView msg = (TextView) dm.findViewById(R.id.rcv_msg_msg);
 
-        src.setText(mHomeFragment.findExpressionById(entry.sourceProximityEntryId()));
-        dst.setText(mHomeFragment.findExpressionById(entry.destinationProximityEntryId()));
-        msg.setText(entry.message());
+        src.setText(mHomeFragment.findExpressionById(entry.getSourceProximityEntryId()));
+        dst.setText(mHomeFragment.findExpressionById(entry.getDestinationProximityEntryId()));
+        msg.setText(entry.getMessage());
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
         {
@@ -948,59 +1007,18 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Loads in the config necessary for the M87 lib to run
-     */
-    private void loadConfig()
-    {
-        BufferedReader br = null;
-
-        try
-        {
-            br = new BufferedReader(new FileReader("/data/local/tmp/mwc.config"));
-            String line;
-            String delims = "\\s*=\\s*";
-
-            while ((line = br.readLine()) != null)
-            {
-                Logger.debug("[CONFIG] " + line);
-
-                String[] tokens = line.split(delims);
-                if (tokens.length != 2) continue;
-
-                if (tokens[0].equals("SAM_NO_ACCESSIBILITY")) mNoAccessibility = (Integer.parseInt(tokens[1]) != 0);
-            }
-            if (br != null) br.close();
-        }
-        catch (Exception e)
-        {
-            // File not found or other exceptions are ignored
-            Logger.error(e.getMessage());
-        }
-    };
-
-    /**
      * Init the connection protocol
      */
-    private void initSubscribe() {
+    public void initSubscribe() {
         Logger.debug("INIT: Function launch");
 
         // Send subscribe
-        mApi.subscribe(TID_SUBSCRIBE, Controls.SUBSCRIBE_CHANNEL, Controls.SUBSCRIBE_RANGE);
+        mApi.subscribe(TID_SUBSCRIBE, Controls.SUBSCRIBE_CHANNEL);
 
         Logger.debug("INIT: Successfully subscribed");
 
         Toast msg = Toast.makeText(getApplicationContext(), "Successfully subscribed to channel "+Controls.SUBSCRIBE_CHANNEL, Toast.LENGTH_SHORT);
         msg.show();
-
-        // Wait a second to flip the buttons
-//        new android.os.Handler().postDelayed(
-//                new Runnable() {
-//                    public void run() {
-//                        // Toggle buttons
-//                        initSubscribeButton.setVisibility(View.GONE);
-//                        initPublishButton.setVisibility(View.VISIBLE);
-//                    }
-//                }, 1000);
 
     };
 
@@ -1025,7 +1043,7 @@ public class HomeActivity extends AppCompatActivity {
     };
 
     private void cancelInit() {
-        mApi.cancelSubscribe(TID_SUBSCRIBE_CANCEL, Controls.SUBSCRIBE_CHANNEL);
+        mApi.cancelSubscribe(TID_SUBSCRIBE_CANCEL, customControls.subscribeMessage);
 
         mApi.cancelPublish(TID_PUBLISH_CANCEL, customControls.publishMessage);
 
@@ -1035,20 +1053,16 @@ public class HomeActivity extends AppCompatActivity {
     /**
      * Init the connection protocol
      */
-    private void initPublish() {
+    public void initPublish() {
         Logger.debug("PUBLISH: Function launch");
 
         // Send subscribe
-        mApi.publish(TID_PUBLISH, customControls.publishMessage, Controls.SUBSCRIBE_RANGE, null);
+        mApi.publish(TID_PUBLISH, customControls.publishMessage, "", true);
 
         Logger.debug("PUBLISH: Successfully published");
 
         Toast msg = Toast.makeText(getApplicationContext(), "Published msg:  "+customControls.publishMessage, Toast.LENGTH_LONG);
         msg.show();
-
-        if (this.customControls.isTransmitter) {
-            initTest();
-        }
     };
 
 
@@ -1080,7 +1094,8 @@ public class HomeActivity extends AppCompatActivity {
         // TODO: Populate sourceExpression from publishing list
         ProximityMessage proxMsg = new ProximityMessage(mSelfProximityEntryId, dstProximityEntryId, msg);
         msgList.append(msgTid, proxMsg);
-        mApi.sendDirectMessage(msgTid, proxMsg);
+        int r = mApi.sendMessage(msgTid, proxMsg);
+        if (r != 0) handleSyncError(r);
         msgTid++;
     }
 
@@ -1092,6 +1107,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mTestFragment = new TestFragment();
         mHomeFragment = new HomeFragment();
         mMessageFragment = new MessageFragment();
 
@@ -1103,10 +1119,12 @@ public class HomeActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.home_tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText(""));
         tabLayout.addTab(tabLayout.newTab().setText(""));
+        tabLayout.addTab(tabLayout.newTab().setText(""));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        tabLayout.getTabAt(0).setIcon(R.drawable.icon_home_selected);
-        tabLayout.getTabAt(1).setIcon(R.drawable.icon_message_selected);
+        tabLayout.getTabAt(0).setIcon(R.drawable.icon_test_selected);
+        tabLayout.getTabAt(1).setIcon(R.drawable.icon_home_selected);
+        tabLayout.getTabAt(2).setIcon(R.drawable.icon_message_selected);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager_home);
         final PagerAdapter adapter = new HomeTabPagerAdapter
@@ -1131,10 +1149,12 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         /******* M87 ********/
-        loadConfig();   // Load in the config
 
-        if (loadM87()) startM87();
+        startM87();
 
+        Logger.debug(IndexCodingMessage.parseMessage("TX.1.4.0.1.4.78").toString());
+
+        //HomeFragment.neighborList.add(new ProximityEntry());
 
         // Set broadcast listener for logout (
 //        IntentFilter intentFilter = new IntentFilter();
@@ -1212,9 +1232,12 @@ public class HomeActivity extends AppCompatActivity {
 
             switch (position) {
                 case 0:
+                    if (mTestFragment == null) mTestFragment = new TestFragment();
+                    return mTestFragment;
+                case 1:
                     if (mHomeFragment == null) mHomeFragment = new HomeFragment();
                     return mHomeFragment;
-                case 1:
+                case 2:
                     if (mMessageFragment == null) mMessageFragment = new MessageFragment();
                     return mMessageFragment;
                 default:
@@ -1234,7 +1257,7 @@ public class HomeActivity extends AppCompatActivity {
         if (mApi != null)
         {
             Logger.debug("Exiting API");
-            NeighborsFragment.neighborList.clear();
+            HomeFragment.neighborList.clear();
             mApi.terminate();
             mApi = null;
         }
@@ -1251,6 +1274,49 @@ public class HomeActivity extends AppCompatActivity {
     public void onBackPressed()
     {
         confirmExit();
+    }
+
+    /**
+     * On change of the radio buttons
+     * @param view
+     */
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.radio_control_test_store_yes:
+                if (checked)
+
+                    break;
+            case R.id.radio_control_test_store_no:
+                if (checked)
+
+                    break;
+            case R.id.radio_control_test_use_ic_yes:
+                if (checked)
+
+                    break;
+            case R.id.radio_control_test_use_ic_no:
+                if (checked)
+
+                    break;
+        }
+    }
+
+    public void addProximityEvent(ProximityEntry e) {
+        if (e.getExpression() != null) {
+            HomeFragment.neighborList.add(e);
+            HomeFragment.neighborListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void addChatMessage(ChatMessage m) {
+        if (m.message != null) {
+            MessageFragment.messageList.add(m);
+            MessageFragment.messageListAdapter.notifyDataSetChanged();
+        }
     }
 
 }

@@ -39,4 +39,7 @@
     <color name="green">#FF8ac442</color>
     <color name="light_green">#FFADE26B</color>
 
+    Black
+    <color name="black">#FF000000</color>
+
 </resources>

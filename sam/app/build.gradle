@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 def m87SdkDir = project.hasProperty('M87_SDK') ? M87_SDK + "/sdk" : "../.."
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 25
     buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "com.m87.sam"
@@ -31,7 +31,7 @@ repositories {flatDir {dirs (m87SdkDir + "/libs")}}
 dependencies {
     sdkCompile 'com.m87.mwc:m87sdk:+@aar'
 
-    compile 'com.android.support:appcompat-v7:23.+'
+    compile 'com.android.support:appcompat-v7:25.+'
     compile 'com.android.support:design:+'
 }
 

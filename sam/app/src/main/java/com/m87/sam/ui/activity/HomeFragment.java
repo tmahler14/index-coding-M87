@@ -13,12 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.m87.sam.R;
 import com.m87.sam.ui.fragment.NeighborsFragment;
+import com.m87.sam.ui.util.Logger;
 import com.m87.sdk.ProximityEntry;
 
 import java.util.ArrayList;
@@ -29,6 +31,9 @@ public class HomeFragment extends Fragment {
     public static ArrayAdapter neighborListAdapter;
     private ListView neighborListView;
     private Context context;
+
+    public Button initSubscribeButton;
+    public Button initPublishButton;
 
     @Override
     public void onAttach(Activity activity)
@@ -45,6 +50,25 @@ public class HomeFragment extends Fragment {
         neighborListView.setAdapter(neighborListAdapter);
         neighborListView.setClickable(true);
         neighborListView.setOnItemClickListener(new neighborClickListener());
+
+        // Init buttons
+        initPublishButton = (Button) mRootView.findViewById(R.id.button_init_publish);
+        initSubscribeButton = (Button) mRootView.findViewById(R.id.button_init_subscribe);
+
+        initPublishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((HomeActivity) getActivity()).initPublish();
+            }
+        });
+
+        initSubscribeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((HomeActivity) getActivity()).initSubscribe();
+            }
+        });
+
         return mRootView;
     }
 
@@ -65,7 +89,7 @@ public class HomeFragment extends Fragment {
     {
         for (ProximityEntry n : neighborList)
         {
-            if (n.id() == id) return n.expression();
+            if (n.getId() == id) return n.getExpression();
         }
         return "";
     }
@@ -95,90 +119,86 @@ public class HomeFragment extends Fragment {
             }
         }
 
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {
-            LayoutInflater inflater =
-                    (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = LayoutInflater.from(getContext());
 
             View rowView;
-            if (convertView == null) rowView = inflater.inflate(R.layout.neighbor_table, parent, false);
+            if (convertView == null) rowView = inflater.inflate(R.layout.neighbor_list_item, parent, false);
             else                     rowView = convertView;
 
-            final ProximityEntry n = (ProximityEntry) this.routingTable.get(position);
+            final ProximityEntry n = getItem(position);
+
+            Logger.debug("Entry pos:"+position);
+            Logger.debug("Expr: "+n.getExpression());
+            Logger.debug("Meta: "+n.getMetaData());
+            Logger.debug("Hop: "+n.getHopCount());
+            Logger.debug("Conn: "+n.getConnectionStatus());
+
 
             TextView exprStr = (TextView) rowView.findViewById(R.id.neighbors_expr_str);
-            exprStr.setText("" + n.expression());
-            exprStr.setContentDescription(getString(R.string.uit_neighbor_expr_str_cell));
+            exprStr.setText("Device: " + n.getExpression());
 
             TextView metadata = (TextView) rowView.findViewById(R.id.neighbors_metadata);
-            metadata.setText("" + n.metaData());
-            metadata.setContentDescription(getString(R.string.uit_neighbor_metadata_cell));
+            metadata.setText("" + n.getMetaData());
 
-            TextView hops = (TextView) rowView.findViewById(R.id.neighbors_hops);
-            hops.setText("" + n.range());
-            hops.setContentDescription(getString(R.string.uit_neighbor_hops_cell));
-
-            TextView met = (TextView) rowView.findViewById(R.id.neighbors_met);
-            met.setText("" + n.metrics());
-            met.setContentDescription(getString(R.string.uit_neighbor_met_cell));
-
-            TextView conn = (TextView) rowView.findViewById(R.id.neighbors_conn);
-            conn.setText("" + n.connStatus());
-            conn.setContentDescription(getString(R.string.uit_neighbor_conn_cell));
-
-            int tf = n.isSelf() ? Typeface.BOLD : Typeface.NORMAL;
-            exprStr .setTypeface(null, tf);
-            metadata.setTypeface(null, tf);
-            hops    .setTypeface(null, tf);
-            met     .setTypeface(null, tf);
-            conn    .setTypeface(null, tf);
-
-            int color = getTextColor(n.range());
+            int color = n.isSelf() ? getContext().getResources().getColor(R.color.grey) : getContext().getResources().getColor(R.color.blue);
             exprStr .setTextColor(color);
             metadata.setTextColor(color);
-            hops    .setTextColor(color);
-            met     .setTextColor(color);
-            conn    .setTextColor(color);
+
+//            exprStr .setTypeface(null, tf);
+//            metadata.setTypeface(null, tf);
+//            hops    .setTypeface(null, tf);
+//            conn    .setTypeface(null, tf);
+
+//            int color = getTextColor(n.getHopCount());
+//            exprStr .setTextColor(color);
+//            metadata.setTextColor(color);
+//            hops    .setTextColor(color);
+//            conn    .setTextColor(color);
 
             rowView.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
-                    View msgView = getActivity().getLayoutInflater().inflate(R.layout.send_msg, null);
+                    HomeActivity activity = (HomeActivity)getActivity();
+                    if (!activity.isConnectionMonitorOn()) {
+                        // If P2P Communication service is not ON, cannot send direct message
+                        activity.setUpConnectionMonitor();
+                    } else {
+                        View msgView = getActivity().getLayoutInflater().inflate(R.layout.send_msg, null);
 
-                    final TextView exprStr  = (TextView) msgView.findViewById(R.id.send_msg_expr_str);
-                    final EditText msgInput = (EditText) msgView.findViewById(R.id.send_msg_msg);
+                        final TextView exprStr = (TextView) msgView.findViewById(R.id.send_msg_expr_str);
+                        final EditText msgInput = (EditText) msgView.findViewById(R.id.send_msg_msg);
 
-                    exprStr.setText("To: "+String.valueOf(n.expression()));
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle(R.string.send_msg)
-                            .setView(msgView)
-                            .setPositiveButton(android.R.string.ok,
-                                    new DialogInterface.OnClickListener()
-                                    {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which)
-                                        {
-                                            String msg = msgInput.getText().toString();
+                        exprStr.setText("To: " + String.valueOf(n.getExpression()));
+                        new AlertDialog.Builder(getActivity())
+                                .setTitle(R.string.send_msg)
+                                .setView(msgView)
+                                .setPositiveButton(android.R.string.ok,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                String msg = msgInput.getText().toString();
 
-                                            if (msg.length() == 0) return;
-                                            ((Sam)getActivity()).newMsg(n.id(), msg);
-                                            dialog.dismiss();
-                                        }
-                                    })
-                            .setNegativeButton(android.R.string.cancel,
-                                    new DialogInterface.OnClickListener()
-                                    {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which)
-                                        {
-                                            dialog.cancel();
-                                        }
-                                    })
-                            .create()
-                            .show();
+                                                if (msg.length() == 0) return;
+                                                ((HomeActivity) getActivity()).newMsg(n.getId(), msg);
+                                                dialog.dismiss();
+                                            }
+                                        })
+                                .setNegativeButton(android.R.string.cancel,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.cancel();
+                                            }
+                                        })
+                                .create()
+                                .show();
+                    }
                 }
             });
 

@@ -21,13 +21,5 @@
         android:visibility="gone"
         android:textColor="@color/white"/>
 
-    <!--Test Init-->
-    <Button
-        android:id="@+id/button_init_test"
-        style="@style/ButtonBlue"
-        android:background="@drawable/button_blue"
-        android:text="@string/button_init_test"
-        android:visibility="gone"
-        android:textColor="@color/white"/>
 
 </LinearLayout>

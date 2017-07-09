@@ -17,9 +17,9 @@ import com.m87.sam.ui.util.Controls;
  */
 
 public class ControlActivity extends AppCompatActivity {
-    RadioGroup control_rg_device_type, control_rg_algorithm_type;
+    RadioGroup control_rg_device_type;
     Button initButton;
-    EditText et_drop_prob, et_num_tests;
+    EditText et_drop_prob;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,16 +27,13 @@ public class ControlActivity extends AppCompatActivity {
 
         // Init view
         control_rg_device_type = (RadioGroup) findViewById(R.id.radio_group_device_type);
-        control_rg_algorithm_type = (RadioGroup) findViewById(R.id.radio_group_algorithm_type);
 
         initButton = (Button) findViewById(R.id.bt_init_controls);
 
         et_drop_prob = (EditText) findViewById(R.id.et_control_drop_probability);
-        et_num_tests = (EditText) findViewById(R.id.et_control_num_tests);
 
         // Init radio
         control_rg_device_type.check(R.id.radio_control_receiver);
-        control_rg_algorithm_type.check(R.id.radio_control_greedy);
 
         // Init button
         initButton.setOnClickListener(new View.OnClickListener() {
@@ -69,19 +66,9 @@ public class ControlActivity extends AppCompatActivity {
         }
 
         // Set num tests
-        if( !(et_num_tests.getText().toString().matches("")) ){
-            Controls.getInstance().setNumTests(Integer.parseInt(et_num_tests.getText().toString()));
-        }
-
-        // Set algo type
-        switch (control_rg_algorithm_type.getCheckedRadioButtonId()) {
-            case R.id.radio_control_greedy:
-                Controls.getInstance().setAlgoType(0);
-                break;
-            case R.id.radio_control_clique:
-                Controls.getInstance().setAlgoType(1);
-                break;
-        }
+//        if( !(et_num_tests.getText().toString().matches("")) ){
+//            Controls.getInstance().setNumTests(Integer.parseInt(et_num_tests.getText().toString()));
+//        }
 
         // Show message
         String controlMsg = String.format("Controls Initialized!\nType: %s\nAlgo: %s\nDrop Prob: %.2f\nNum Tests: %d",

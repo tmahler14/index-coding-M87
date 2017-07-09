@@ -1,13 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical"
     android:background="@color/white">
+
+    <TextView
+        android:id="@+id/tv_home_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/grey"
+        android:text="Connected Devices"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:textStyle="bold"/>
 
     <ListView
         android:id="@+id/lv_home_neighbors"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_home_header"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lv_home_neighbors"
+        android:layout_alignParentBottom="true"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:weightSum="1.0">
+
+        <!--Publish Init-->
+        <Button
+            android:id="@+id/button_init_publish"
+            style="@style/ButtonBlue"
+            android:background="@drawable/button_blue"
+            android:text="@string/button_init_publish"
+            android:textColor="@color/white"
+            android:layout_width="0dip"
+            android:layout_weight="0.5"/>
+
+        <!--Subscribe Init-->
+        <Button
+            android:id="@+id/button_init_subscribe"
+            style="@style/ButtonBlue"
+            android:background="@drawable/button_green"
+            android:text="@string/button_init_subscribe"
+            android:textColor="@color/white"
+            android:layout_width="0dip"
+            android:layout_weight="0.5"/>
+
+    </LinearLayout>
+
 
 </RelativeLayout>

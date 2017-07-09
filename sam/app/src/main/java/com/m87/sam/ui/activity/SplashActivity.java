@@ -21,7 +21,7 @@ import com.m87.sam.R;
 public class SplashActivity extends Activity {
 
     // Splash screen timer
-    private static int SPLASH_TIME_OUT = 10;
+    private static int SPLASH_TIME_OUT = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
