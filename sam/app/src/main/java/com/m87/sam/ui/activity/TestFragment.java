@@ -118,6 +118,11 @@ public class TestFragment extends Fragment {
 
 
                                 // TODO set test and run test
+                                if (testType == 0) {
+                                    ((HomeActivity) getActivity()).startBasicAlgoTest();
+                                } else {
+                                    ((HomeActivity) getActivity()).startFinalDemoTest();
+                                }
 
 
                                 dialog.dismiss();

@@ -82,7 +82,7 @@ public class MessageFragment extends Fragment {
 
             // Set text
             chatText.setText(chatMessageObj.message);
-            SimpleDateFormat df = new SimpleDateFormat("h:mm a");
+            SimpleDateFormat df = new SimpleDateFormat("h:mm:ss.SS a");
             chatTime.setText(df.format(chatMessageObj.timestamp.getTime()));
 
             return row;

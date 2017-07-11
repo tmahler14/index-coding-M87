@@ -11,7 +11,7 @@ import android.os.Build;
 public class Controls {
     private static Controls instance = null;
 
-    public double receiveProb = 0.75; // Fictitious chances the receiver receives the message
+    public double receiveProb = 0.65; // Fictitious chances the receiver receives the message
     public Boolean isTransmitter = false;   // Set to true if transmitting devicxze
     public int numTests = 1;
 
@@ -60,6 +60,7 @@ public class Controls {
     public static final String RX5_PUBLISH = SUBSCRIBE_CHANNEL+"."+RX5;
 
     public String deviceId;
+    public String deviceLabel;
     public String publishMessage;
     public String subscribeMessage;
 
@@ -73,30 +74,38 @@ public class Controls {
 
     public Controls() {
         subscribeMessage = SUBSCRIBE_CHANNEL;
+        Logger.debug("Serial");
+        Logger.debug(serialNumber);
         switch (serialNumber) {
             case TX1_SERIAL:
                 publishMessage = TX1_PUBLISH;
                 isTransmitter = true;
+                deviceLabel = TX1;
                 break;
             case RX1_SERIAL:
                 publishMessage = RX1_PUBLISH;
                 isTransmitter = false;
+                deviceLabel = RX1;
                 break;
             case RX2_SERIAL:
                 publishMessage = RX2_PUBLISH;
                 isTransmitter = false;
+                deviceLabel = RX2;
                 break;
             case RX3_SERIAL:
                 publishMessage = RX3_PUBLISH;
                 isTransmitter = false;
+                deviceLabel = RX3;
                 break;
             case RX4_SERIAL:
                 publishMessage = RX4_PUBLISH;
                 isTransmitter = false;
+                deviceLabel = RX4;
                 break;
             case RX5_SERIAL:
                 publishMessage = RX5_PUBLISH;
                 isTransmitter = false;
+                deviceLabel = RX5;
                 break;
         }
     }

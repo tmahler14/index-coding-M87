@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.m87.sam.R;
 import com.m87.sam.ui.fragment.NeighborsFragment;
+import com.m87.sam.ui.pojos.M87ProximityDevice;
 import com.m87.sam.ui.util.Logger;
 import com.m87.sdk.ProximityEntry;
 
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
-    public static ArrayList<ProximityEntry> neighborList = new ArrayList<ProximityEntry>();
+    public static ArrayList<M87ProximityDevice> neighborList = new ArrayList<M87ProximityDevice>();
     public static ArrayAdapter neighborListAdapter;
     private ListView neighborListView;
     private Context context;
@@ -87,14 +88,14 @@ public class HomeFragment extends Fragment {
 
     public String findExpressionById(int id)
     {
-        for (ProximityEntry n : neighborList)
+        for (M87ProximityDevice n : neighborList)
         {
             if (n.getId() == id) return n.getExpression();
         }
         return "";
     }
 
-    public class RouteArrayAdapter extends ArrayAdapter<ProximityEntry>
+    public class RouteArrayAdapter extends ArrayAdapter<M87ProximityDevice>
     {
         private Context context;
         private  ArrayList routingTable;
@@ -129,13 +130,13 @@ public class HomeFragment extends Fragment {
             if (convertView == null) rowView = inflater.inflate(R.layout.neighbor_list_item, parent, false);
             else                     rowView = convertView;
 
-            final ProximityEntry n = getItem(position);
+            final M87ProximityDevice n = getItem(position);
 
-            Logger.debug("Entry pos:"+position);
-            Logger.debug("Expr: "+n.getExpression());
-            Logger.debug("Meta: "+n.getMetaData());
-            Logger.debug("Hop: "+n.getHopCount());
-            Logger.debug("Conn: "+n.getConnectionStatus());
+//            Logger.debug("Entry pos:"+position);
+//            Logger.debug("Expr: "+n.getExpression());
+//            Logger.debug("Meta: "+n.getMetaData());
+//            Logger.debug("Hop: "+n.getHopCount());
+//            Logger.debug("Conn: "+n.getConnectionStatus());
 
 
             TextView exprStr = (TextView) rowView.findViewById(R.id.neighbors_expr_str);

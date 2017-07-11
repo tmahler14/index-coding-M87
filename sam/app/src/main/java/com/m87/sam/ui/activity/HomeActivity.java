@@ -38,8 +38,11 @@ import android.widget.Toast;
 import com.m87.sam.BuildConfig;
 import com.m87.sam.R;
 import com.m87.sam.ui.fragment.NeighborsFragment;
+import com.m87.sam.ui.pojos.BasicAlgoTest;
 import com.m87.sam.ui.pojos.ChatMessage;
 import com.m87.sam.ui.pojos.IndexCodingMessage;
+import com.m87.sam.ui.pojos.M87ProximityDevice;
+import com.m87.sam.ui.pojos.ReceiverHandler;
 import com.m87.sam.ui.util.Controls;
 import com.m87.sam.ui.util.Logger;
 import com.m87.sdk.ProximityConfig;
@@ -77,11 +80,11 @@ public class HomeActivity extends AppCompatActivity {
     public  static final int TID_SET_VALUE        = 8707;
     public  static final int TID_GET_VALUE        = 8708;
 
-    private ProximityManager mApi;
+    public ProximityManager mApi;
 
-    private TestFragment mTestFragment;
-    private HomeFragment mHomeFragment;
-    private MessageFragment mMessageFragment;
+    public TestFragment mTestFragment;
+    public HomeFragment mHomeFragment;
+    public MessageFragment mMessageFragment;
 
     private AlertDialog m87InstallDialog;
     private AlertDialog m87InitDialog;
@@ -99,6 +102,11 @@ public class HomeActivity extends AppCompatActivity {
     private Tab homeTab, messageTab;
 
     private Controls customControls = Controls.getInstance();
+
+    // Tests
+    public boolean testRunning = false;
+    public BasicAlgoTest basicTest;
+    public ReceiverHandler receiverHandler;
 
     //**************************************************************************************************
     // Private classes
@@ -228,29 +236,28 @@ public class HomeActivity extends AppCompatActivity {
 
                     addProximityEvent(entry);
 
-                    // If the transmitter, then send init message
-                    if (!customControls.isTransmitter && entry.getExpression().contains("TX")) {
-                        sendInitMsg(entry.getId());
+                    if (customControls.isTransmitter) {
+                        newMsg(entry.getId(), "init connection");
                     }
 
                     break;
                 case ProximityManager.MatchState.UPDATE:
                     op = "Updating";
-                    for (ProximityEntry n : HomeFragment.neighborList)
+                    for (M87ProximityDevice n : HomeFragment.neighborList)
                     {
                         if (n.getId() == entry.getId())
                         {
-                            ProximityEntry.copy(n, entry);
+                            M87ProximityDevice.copy(n, entry);
                             break;
                         }
                     }
                     break;
                 case ProximityManager.MatchState.DELETE:
                     op = "Deleting";
-                    Iterator<ProximityEntry> it = HomeFragment.neighborList.iterator();
+                    Iterator<M87ProximityDevice> it = HomeFragment.neighborList.iterator();
                     while (it.hasNext())
                     {
-                        ProximityEntry n = it.next();
+                        M87ProximityDevice n = it.next();
                         if (n.getId() == entry.getId())
                         {
                             if (entry.isSelf()) mSelfProximityEntryId = -1;
@@ -258,6 +265,7 @@ public class HomeActivity extends AppCompatActivity {
                             break;
                         }
                     }
+                    MessageFragment.messageListAdapter.notifyDataSetChanged();
                     break;
             }
 
@@ -269,7 +277,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public void onReceiveMessage(ProximityMessage obj)
         {
-            if (obj == null)
+            if (obj == null || obj.getMessage() == null || obj.getMessage().length() == 0)
             {
                 Logger.debug("entry is null");
                 return;
@@ -278,12 +286,36 @@ public class HomeActivity extends AppCompatActivity {
             Logger.debug("Receive Msg Entry: sourceProximityEntryId(%d) destinationProximityEntryId(%d) msg(%s)",
                     obj.getSourceProximityEntryId(), obj.getDestinationProximityEntryId(), obj.getMessage());
 
-            Toast msg = Toast.makeText(getApplicationContext(), "Msg received: "+obj.getMessage(), Toast.LENGTH_LONG);
+            Toast msg = Toast.makeText(getApplicationContext(), "Msg received: "+obj.getMessage(), Toast.LENGTH_SHORT);
             msg.show();
 
             addChatMessage(new ChatMessage(obj.getSourceProximityEntryId(), obj.getDestinationProximityEntryId(), obj.getMessage(), true));
 
+            // If receiver, and message contains the init trigger, trigger test
+            if (!customControls.isTransmitter && obj.getMessage().contains("test_init")) {
+                testRunning = true;
+                receiverHandler = new ReceiverHandler(HomeActivity.this);
+            }
 
+            if (testRunning) {
+                IndexCodingMessage message = IndexCodingMessage.parseMessage(obj.getSourceProximityEntryId(), obj.getMessage());
+
+                if (message != null) {
+                    Logger.debug("Test message");
+                    Logger.debug("Is transmitter = " + customControls.isTransmitter);
+                    Logger.debug("Test type = " + customControls.testType);
+
+                    if (customControls.isTransmitter) {
+
+                        // Handle basic test
+                        if (customControls.testType == 0) {
+                            basicTest.handleMessage(message);
+                        }
+                    } else {
+                        receiverHandler.handleMessage(message);
+                    }
+                }
+            }
             //displayMessageReceived(obj);
         }
 
@@ -300,8 +332,8 @@ public class HomeActivity extends AppCompatActivity {
 
                 if (proxMsg != null)
                 {
-                    Toast msg = Toast.makeText(getApplicationContext(), "Receieved Ack from "+proxMsg.getSourceProximityEntryId(), Toast.LENGTH_LONG);
-                    msg.show();
+//                    Toast msg = Toast.makeText(getApplicationContext(), "Receieved Ack from "+proxMsg.getSourceProximityEntryId(), Toast.LENGTH_LONG);
+//                    msg.show();
                     //displayMessageAcked(proxMsg);
                     msgList.delete(transactionId);
                 }
@@ -1152,7 +1184,7 @@ public class HomeActivity extends AppCompatActivity {
 
         startM87();
 
-        Logger.debug(IndexCodingMessage.parseMessage("TX.1.4.0.1.4.78").toString());
+        //Logger.debug(IndexCodingMessage.parseMessage("TX.1.4.0.1.4.78").toString());
 
         //HomeFragment.neighborList.add(new ProximityEntry());
 
@@ -1307,7 +1339,7 @@ public class HomeActivity extends AppCompatActivity {
 
     public void addProximityEvent(ProximityEntry e) {
         if (e.getExpression() != null) {
-            HomeFragment.neighborList.add(e);
+            HomeFragment.neighborList.add(new M87ProximityDevice(e));
             HomeFragment.neighborListAdapter.notifyDataSetChanged();
         }
     }
@@ -1317,6 +1349,27 @@ public class HomeActivity extends AppCompatActivity {
             MessageFragment.messageList.add(m);
             MessageFragment.messageListAdapter.notifyDataSetChanged();
         }
+    }
+
+    public void startBasicAlgoTest() {
+        // Show toast
+        Toast msg = Toast.makeText(getApplicationContext(), "Starting basic algo test", Toast.LENGTH_SHORT);
+        msg.show();
+
+        // Create and start test
+        testRunning = true;
+        basicTest = new BasicAlgoTest(this.getApplicationContext(), this);
+        basicTest.run();
+
+
+    }
+
+    public void startFinalDemoTest() {
+        // Show toast
+        Toast msg = Toast.makeText(getApplicationContext(), "Starting final demo test", Toast.LENGTH_SHORT);
+        msg.show();
+
+
     }
 
 }
