@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.m87.sam" >
     <!-- Permissions -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -44,10 +45,10 @@
             android:screenOrientation="portrait" >
         </activity>
 
-        <service
-           android:name="com.m87.mwc.Mwc"
-           android:exported="true" >
-        </service>
+        <!--<service-->
+           <!--android:name="com.m87.mwc.Mwc"-->
+           <!--android:exported="true" >-->
+        <!--</service>-->
         <!-- Receivers -->
     </application>
 

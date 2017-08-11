@@ -118,8 +118,17 @@ public class IndexCodingMessage {
         m.roundType = Integer.parseInt(messageTokens[3]);
         m.destinationDeviceIdx = Integer.parseInt(messageTokens[4]);
         m.messageSize = Integer.parseInt(messageTokens[5]);
-        m.messageByteArr = convertStringToBinaryArray(m.messageSize, messageTokens[6]);
-        m.messageString = paddBinaryString(m.messageSize, Integer.toBinaryString(Integer.parseInt(messageTokens[6])));
+
+        // Transmitter recieves bits
+        if (Controls.getInstance().isTransmitter) {
+            m.messageByteArr = convertBitsToBinaryArray(messageTokens[6]);
+            m.messageString = messageTokens[6];
+        }
+        // Else the receivers recieve hex messages
+        else {
+            m.messageByteArr = convertStringToBinaryArray(m.messageSize, Integer.toString(Integer.parseInt(messageTokens[6], 16)));
+            m.messageString = paddBinaryString(m.messageSize, Integer.toBinaryString(Integer.parseInt(messageTokens[6], 16)));
+        }
 
         return m;
     }
@@ -183,6 +192,16 @@ public class IndexCodingMessage {
         return binaryArray;
     }
 
+    public static int[] convertBitsToBinaryArray(String message) {
+        int[] binaryArray = new int[message.length()];
+
+        for (int i = 0; i < message.length(); i++) {
+            binaryArray[i] = Integer.parseInt(Character.toString(message.charAt(i)));
+        }
+
+        return binaryArray;
+    }
+
     public static String generateRandomBinaryMessage(int size) {
         Random random = new Random();
         int nextNumber = random.nextInt((int)Math.pow((double)2, (double)size) - 1) + 1;
@@ -198,8 +217,14 @@ public class IndexCodingMessage {
         return randomString;
     }
 
-    public static int binaryToInt(String binary) {
-        return Integer.parseInt(binary, 2);
+    public static int binaryToInt(String binaryStr) {
+        return Integer.parseInt(binaryStr, 2);
+    }
+
+    public static String binaryToHex(String binaryStr) {
+        int decimal = Integer.parseInt(binaryStr,2);
+        String hexStr = Integer.toString(decimal,16);
+        return hexStr;
     }
 
     public static String replaceCharAt(String s, int pos, char c) {

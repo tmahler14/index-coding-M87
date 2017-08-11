@@ -18,6 +18,8 @@ public class ReceiverHandler {
     public HomeActivity activity;
 
     public ArrayList<String> roundMessages = new ArrayList<String>();
+    public Matrix roundMessageMatrix;
+    public int roundMessageMatrixPtr;
 
     public ReceiverHandler(HomeActivity activity) {
         this.activity = activity;
@@ -96,7 +98,11 @@ public class ReceiverHandler {
 
         // Clear the array of round messages
         roundMessages.clear();
+        roundMessageMatrix = createRoundMatrix(m);  // create new matrix of messages received
+        roundMessageMatrixPtr = 0;
         String receiveMsgStr = randomlyDropMessages(messages);
+
+        roundMessageMatrix.show();  // print matrix
 
         // Send back message to transmitter declaring which messages were received
         IndexCodingMessage returnMessage = IndexCodingMessage.buildTestMessage(m.sourceDevice.getId());
@@ -105,11 +111,22 @@ public class ReceiverHandler {
         returnMessage.messageSize = m.messageSize;
         returnMessage.messageByteArr = IndexCodingMessage.convertStringToBinaryArray(receiveMsgStr.length(), receiveMsgStr);
         returnMessage.destinationDeviceIdx = m.destinationDeviceIdx;
+        returnMessage.numDevices = m.numDevices;
+
         returnMessage.fullMessage = returnMessage.buildTestFullMessage();
 
         Logger.debug("Return msg --> "+returnMessage.toString());
 
         activity.newMsg(returnMessage.destinationDevice.getId(), returnMessage.fullMessage);
+    }
+
+    /**
+     * Create new round of message matrix
+     * @param m
+     * @return
+     */
+    public Matrix createRoundMatrix(IndexCodingMessage m) {
+        return new Matrix(m.numDevices*2, m.numDevices);
     }
 
     /**
@@ -127,6 +144,8 @@ public class ReceiverHandler {
             if (flip <= Controls.getInstance().getReceiveProb()) {
                 Logger.debug("Receieved!");
                 roundMessages.add(messages[i]);
+                roundMessageMatrix.setVal(roundMessageMatrixPtr, i, 1);
+                roundMessageMatrixPtr++;
                 receiveStr += "1";
             } else {
                 Logger.debug("Dropped!");

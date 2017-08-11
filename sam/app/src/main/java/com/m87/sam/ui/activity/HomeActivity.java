@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.TabLayout;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.util.SparseArray;
 import android.view.Menu;
@@ -40,8 +41,11 @@ import com.m87.sam.R;
 import com.m87.sam.ui.fragment.NeighborsFragment;
 import com.m87.sam.ui.pojos.BasicAlgoTest;
 import com.m87.sam.ui.pojos.ChatMessage;
+import com.m87.sam.ui.pojos.GaussianElimination;
+import com.m87.sam.ui.pojos.IndexCoding;
 import com.m87.sam.ui.pojos.IndexCodingMessage;
 import com.m87.sam.ui.pojos.M87ProximityDevice;
+import com.m87.sam.ui.pojos.Matrix;
 import com.m87.sam.ui.pojos.ReceiverHandler;
 import com.m87.sam.ui.util.Controls;
 import com.m87.sam.ui.util.Logger;
@@ -97,6 +101,9 @@ public class HomeActivity extends AppCompatActivity {
     private int mSelfProximityEntryId = -1;
     private int mPowerLevel;
     private ProximityLocation mSelfLocation;
+
+    public static String INIT_RECEIVER = "init receiver connection";
+    public static String INIT_TRANSMITTER = "init transmitter connection";
 
     // Private class params
     private Tab homeTab, messageTab;
@@ -236,8 +243,9 @@ public class HomeActivity extends AppCompatActivity {
 
                     addProximityEvent(entry);
 
-                    if (customControls.isTransmitter) {
-                        newMsg(entry.getId(), "init connection");
+                    if (!customControls.isTransmitter && entry.getExpression().contains("TX")) {
+                        Logger.debug("Sending receiver init message");
+                        newMsg(entry.getId(), INIT_RECEIVER);
                     }
 
                     break;
@@ -292,6 +300,11 @@ public class HomeActivity extends AppCompatActivity {
             addChatMessage(new ChatMessage(obj.getSourceProximityEntryId(), obj.getDestinationProximityEntryId(), obj.getMessage(), true));
 
             // If receiver, and message contains the init trigger, trigger test
+            if (customControls.isTransmitter && obj.getMessage().equals(INIT_RECEIVER)) {
+                Logger.debug("Sending transmitter init message");
+                newMsg(obj.getSourceProximityEntryId(), INIT_TRANSMITTER);
+            }
+
             if (!customControls.isTransmitter && obj.getMessage().contains("test_init")) {
                 testRunning = true;
                 receiverHandler = new ReceiverHandler(HomeActivity.this);
@@ -942,7 +955,7 @@ public class HomeActivity extends AppCompatActivity {
         View exprStrView = getLayoutInflater().inflate(R.layout.set_expr_str_pub_cancel, null);
         final EditText exprStrInput = (EditText) exprStrView.findViewById(R.id.set_expr_str_text);
 
-        mApi.cancelSubscribe(TID_SUBSCRIBE_CANCEL, Controls.SUBSCRIBE_CHANNEL);
+        mApi.cancelSubscribe(TID_SUBSCRIBE_CANCEL, Controls.getInstance().subscribeChannel);
 
         restartConnectionButtons();
     };
@@ -1045,11 +1058,11 @@ public class HomeActivity extends AppCompatActivity {
         Logger.debug("INIT: Function launch");
 
         // Send subscribe
-        mApi.subscribe(TID_SUBSCRIBE, Controls.SUBSCRIBE_CHANNEL);
+        mApi.subscribe(TID_SUBSCRIBE, Controls.getInstance().subscribeChannel);
 
         Logger.debug("INIT: Successfully subscribed");
 
-        Toast msg = Toast.makeText(getApplicationContext(), "Successfully subscribed to channel "+Controls.SUBSCRIBE_CHANNEL, Toast.LENGTH_SHORT);
+        Toast msg = Toast.makeText(getApplicationContext(), "Successfully subscribed to channel "+Controls.getInstance().subscribeChannel, Toast.LENGTH_SHORT);
         msg.show();
 
     };
@@ -1183,6 +1196,15 @@ public class HomeActivity extends AppCompatActivity {
         /******* M87 ********/
 
         startM87();
+
+//        double[][] matrix = { {1,0,0,0,0,1,0,0,0,0}, {0,1,0,0,0,0,1,0,0,0}, {0,1,1,0,0,0,0,1,0,0} };
+//        GaussianElimination.printMatrix(GaussianElimination.run(matrix));
+
+        double[][] matrix2 = { {1,0,0,1,0}, {0,0,1,0,0}, {0,1,0,0,1}, {0,0,1,1,0}, {1,1,0,0,0} };
+        Matrix m = new Matrix(matrix2);
+        m.show();
+        Matrix m2 = IndexCoding.reduceMatrix(m);
+        m2.show();
 
         //Logger.debug(IndexCodingMessage.parseMessage("TX.1.4.0.1.4.78").toString());
 

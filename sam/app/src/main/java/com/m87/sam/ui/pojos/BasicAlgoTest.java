@@ -2,6 +2,7 @@ package com.m87.sam.ui.pojos;
 
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.m87.sam.ui.activity.HomeActivity;
@@ -9,14 +10,21 @@ import com.m87.sam.ui.activity.HomeFragment;
 import com.m87.sam.ui.util.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BasicAlgoTest extends Thread {
     public Context context;
     public HomeActivity activity;
     public int numReceivers;
+
     public ArrayList<IndexCodingMessage> messageList = new ArrayList<IndexCodingMessage>();
     public ArrayList<IndexCodingMessage> initMessageList = new ArrayList<IndexCodingMessage>();
+    public ArrayList<IndexCodingMessage> round1MessageList = new ArrayList<>();
     public ArrayList<Message> testMessages = new ArrayList<Message>();
+
+    public Matrix entireMatrix;
+    public int[] diags;
+    public Matrix reducedMatrix;
 
     public static int MESSAGE_SIZE = 4;
 
@@ -66,6 +74,11 @@ public class BasicAlgoTest extends Thread {
             case 0:
                 handleInitMessage(m);
                 break;
+
+            // Handle round 1 message
+            case 1:
+                handleRound1Message(m);
+                break;
         }
     }
 
@@ -110,6 +123,33 @@ public class BasicAlgoTest extends Thread {
         return initMessageList.size() == this.numReceivers;
     }
 
+    public void handleRound1Message(IndexCodingMessage m) {
+        entireMatrix.setRow(m.destinationDeviceIdx, m.messageByteArr);
+
+        round1MessageList.add(m);
+
+        if (hasReceivedAllRound1Messages()) {
+            runIndexCodingAlgo();
+        }
+    }
+
+    public void runIndexCodingAlgo() {
+        Logger.debug("GOT ALL ROUND 1 MSGs");
+        entireMatrix.show();
+
+        Logger.debug("DIAGS");
+        diags = entireMatrix.getDiagonals();
+        Logger.debug(Arrays.toString(diags));
+
+        reducedMatrix = IndexCoding.reduceMatrix(entireMatrix);
+        Logger.debug("REDUCED");
+        reducedMatrix.show();
+    }
+
+    public boolean hasReceivedAllRound1Messages() {
+        return round1MessageList.size() == this.numReceivers;
+    }
+
     public String createTestMessages(boolean isOriginalMsg) {
         // Generate test messages composed of binary strings
         for (int i = 0; i < initMessageList.size(); i++) {
@@ -138,28 +178,31 @@ public class BasicAlgoTest extends Thread {
 
         Logger.debug("TEST Start test");
 
+        Logger.debug("NUM REC:"+this.numReceivers);
+
         Toast msg = Toast.makeText(this.context, "Init received, starting test", Toast.LENGTH_SHORT);
         msg.show();
 
         // Create test messages
         String finalMessage = createTestMessages(true);
+        entireMatrix = new Matrix(this.numReceivers, this.numReceivers);
 
         Logger.debug("TEST sending test messages");
         for (int i = 0; i < testMessages.size(); i++) {
             IndexCodingMessage m = IndexCodingMessage.buildTestMessage(testMessages.get(i).device.getId());
             m.roundType = IndexCodingMessage.ROUND_FIRST;
-            m.messageString = Integer.toString(IndexCodingMessage.binaryToInt(finalMessage));
+            m.messageString = IndexCodingMessage.binaryToHex(finalMessage);
             m.messageSize = MESSAGE_SIZE;
             m.messageByteArr = IndexCodingMessage.convertStringToBinaryArray(m.messageSize, Integer.toString(IndexCodingMessage.binaryToInt(finalMessage)));
             m.destinationDeviceIdx = testMessages.get(i).device.getDeviceIdx();
+            m.numDevices = this.numReceivers;
+
             m.fullMessage = m.buildTestFullMessage();
 
             Logger.debug("TEST message --> "+m.toString());
             Logger.debug(m.fullMessage);
             activity.newMsg(testMessages.get(i).device.getId(), m.fullMessage);
         }
-
-
 
     }
 }

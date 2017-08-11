@@ -162,7 +162,7 @@ public class TestFragment extends Fragment {
 
                             @Override
                             public void run() {
-                                System.out.println("CHART: degreee = "+degree);
+                                //System.out.println("CHART: degreee = "+degree);
                                 sweepAngleControl++;
 
                                 if (sweepAngleControl <= 90) {

@@ -16,9 +16,9 @@ import android.view.View;
 public class GaugeView extends View {
     private float internalArcStrokeWidth;
 
-    private int colorFirstItem = Color.parseColor("#59F859");
+    private int colorFirstItem = Color.parseColor("#F85959");
     private int colorSecondItem = Color.parseColor("#F8AE59");
-    private int colorThirdItem = Color.parseColor("#F85959");
+    private int colorThirdItem = Color.parseColor("#59F859");
     private int colorMainCenterCircle = Color.WHITE;
     private int colorCenterCircle = Color.parseColor("#434854");
     private int colorPointerLine = Color.parseColor("#434854");

@@ -33,15 +33,20 @@ public class Controls {
 
     // Subscribe channel
     public static final String SUBSCRIBE_CHANNEL = "sam";
+    public static final String SUBSCRIBE_CHANNEL_BASE = "base";
+
     public static final int SUBSCRIBE_RANGE = 6;
 
     // Serial number of device (tell which device is which)
     public static final String TX1_SERIAL = "062a20f200511a45";
-    public static final String RX1_SERIAL = "04f227430b35e69a";
+    public static final String RX1_SERIAL = "0662f60d0b107d4d";
     public static final String RX2_SERIAL = "07f0fb7d0c8cebda";
     public static final String RX3_SERIAL = "0647de8e00612817";
     public static final String RX4_SERIAL = "038ca0dbf0b59709";
-    public static final String RX5_SERIAL = "06c23ed00075d4f3";
+
+    public static final String TXB1_SERIAL = "07535fa400d2260e";
+    public static final String RXB1_SERIAL = "";
+    public static final String RXB2_SERIAL = "06c23ed00075d4f3";
 
     // Device id representation
     public static final String TX1 = "TX1";
@@ -49,7 +54,12 @@ public class Controls {
     public static final String RX2 = "RX2";
     public static final String RX3 = "RX3";
     public static final String RX4 = "RX4";
-    public static final String RX5 = "RX5";
+
+    public static final String TXB1 = "TB1";
+    public static final String RXB1 = "RB1";
+    public static final String RXB2 = "RB2";
+    public static final String RXB3 = "RB3";
+    public static final String RXB4 = "RB4";
 
     // Subscribe messages
     public static final String TX1_PUBLISH = SUBSCRIBE_CHANNEL+"."+TX1;
@@ -57,8 +67,14 @@ public class Controls {
     public static final String RX2_PUBLISH = SUBSCRIBE_CHANNEL+"."+RX2;
     public static final String RX3_PUBLISH = SUBSCRIBE_CHANNEL+"."+RX3;
     public static final String RX4_PUBLISH = SUBSCRIBE_CHANNEL+"."+RX4;
-    public static final String RX5_PUBLISH = SUBSCRIBE_CHANNEL+"."+RX5;
 
+    public static final String TXB1_PUBLISH = SUBSCRIBE_CHANNEL_BASE+"."+TXB1;
+    public static final String RXB1_PUBLISH = SUBSCRIBE_CHANNEL_BASE+"."+RXB1;
+    public static final String RXB2_PUBLISH = SUBSCRIBE_CHANNEL_BASE+"."+RXB2;
+    public static final String RXB4_PUBLISH = SUBSCRIBE_CHANNEL_BASE+"."+RXB3;
+    public static final String RXB5_PUBLISH = SUBSCRIBE_CHANNEL_BASE+"."+RXB4;
+
+    public String subscribeChannel;
     public String deviceId;
     public String deviceLabel;
     public String publishMessage;
@@ -77,35 +93,52 @@ public class Controls {
         Logger.debug("Serial");
         Logger.debug(serialNumber);
         switch (serialNumber) {
+
+            // Demo devices
             case TX1_SERIAL:
+                subscribeChannel = SUBSCRIBE_CHANNEL;
                 publishMessage = TX1_PUBLISH;
                 isTransmitter = true;
                 deviceLabel = TX1;
                 break;
             case RX1_SERIAL:
+                subscribeChannel = SUBSCRIBE_CHANNEL;
                 publishMessage = RX1_PUBLISH;
                 isTransmitter = false;
                 deviceLabel = RX1;
                 break;
             case RX2_SERIAL:
+                subscribeChannel = SUBSCRIBE_CHANNEL;
                 publishMessage = RX2_PUBLISH;
                 isTransmitter = false;
                 deviceLabel = RX2;
                 break;
             case RX3_SERIAL:
+                subscribeChannel = SUBSCRIBE_CHANNEL;
                 publishMessage = RX3_PUBLISH;
                 isTransmitter = false;
                 deviceLabel = RX3;
                 break;
             case RX4_SERIAL:
+                subscribeChannel = SUBSCRIBE_CHANNEL;
                 publishMessage = RX4_PUBLISH;
                 isTransmitter = false;
                 deviceLabel = RX4;
                 break;
-            case RX5_SERIAL:
-                publishMessage = RX5_PUBLISH;
+
+            // Base test devices
+            case TXB1_SERIAL:
+                subscribeChannel = SUBSCRIBE_CHANNEL_BASE;
+                publishMessage = TXB1_PUBLISH;
+                isTransmitter = true;
+                deviceLabel = TXB1;
+                break;
+
+            case RXB2_SERIAL:
+                subscribeChannel = SUBSCRIBE_CHANNEL_BASE;
+                publishMessage = RXB2_PUBLISH;
                 isTransmitter = false;
-                deviceLabel = RX5;
+                deviceLabel = RXB2;
                 break;
         }
     }
