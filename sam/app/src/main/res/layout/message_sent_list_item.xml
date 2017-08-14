@@ -19,7 +19,7 @@
         android:paddingTop="7.5dp"
         android:text="5:45 PM"
         android:textColor="@color/dark_grey"
-        android:textSize="12dp"
+        android:textSize="9dp"
         />
     <TextView
         android:id="@+id/msgr"
@@ -35,5 +35,5 @@
         android:paddingTop="5dp"
         android:text="Sample Sample Sample Sample Sample Sample Sample Sample Sample SampleSampleSampleSampleSampleSampleSampleSampleSample "
         android:textColor="@color/white"
-        android:textSize="18dp"/>
+        android:textSize="14dp"/>
 </LinearLayout>

@@ -11,7 +11,9 @@ import android.os.Build;
 public class Controls {
     private static Controls instance = null;
 
-    public double receiveProb = 0.65; // Fictitious chances the receiver receives the message
+    public double receiveProb = 0.75; // Fictitious chances the receiver receives the message
+    public boolean dontReceiveSelf = true;
+
     public Boolean isTransmitter = false;   // Set to true if transmitting devicxze
     public int numTests = 1;
 

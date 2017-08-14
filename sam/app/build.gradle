@@ -10,6 +10,10 @@ android {
         targetSdkVersion 23
         if (project.hasProperty('mdsVersionCode')) { versionCode = Integer.parseInt(project.mdsVersionCode) }
         if (project.hasProperty('mdsVersionName')) { versionName = project.mdsVersionName }
+
+        jackOptions {
+            enabled true
+        }
     }
     buildTypes {
         release {
@@ -24,6 +28,14 @@ android {
 
     // This is handled for you by the 2.0+ Gradle Plugin
     aaptOptions { additionalParameters "--no-version-vectors" }
+
+    dexOptions {
+        incremental true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 repositories {flatDir {dirs (m87SdkDir + "/libs")}}
@@ -33,6 +45,8 @@ dependencies {
 
     compile 'com.android.support:appcompat-v7:25.+'
     compile 'com.android.support:design:+'
+
+    compile fileTree(include: ['*.jar'], dir: 'libs')
 }
 
 

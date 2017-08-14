@@ -1,5 +1,9 @@
 package com.m87.sam.ui.pojos;
 
+import android.util.Log;
+
+import com.m87.sam.ui.util.Logger;
+
 import java.util.Arrays;
 
 public class GaussianElimination {
@@ -53,6 +57,32 @@ public class GaussianElimination {
         }
 
         System.out.println("------------------");
+    }
+
+    public static Matrix createGaussianMatrix(Matrix roundMessageMatrix) {
+        Matrix newMatrix = new Matrix(roundMessageMatrix.rowSize, roundMessageMatrix.colSize*2);
+
+        Logger.debug("ASS");
+        newMatrix.show();
+        roundMessageMatrix.show();
+
+        // Create matrix
+        for (int i = 0; i < roundMessageMatrix.rowSize; i++) {
+
+            for (int j = 0; j < roundMessageMatrix.colSize; j++) {
+                Logger.debug("i="+i);
+                Logger.debug("j="+j);
+
+                newMatrix.vals[i][j] = roundMessageMatrix.vals[i][j];
+            }
+
+            if (roundMessageMatrix.colSize+i < newMatrix.colSize) {
+                newMatrix.vals[i][roundMessageMatrix.colSize+i] = 1;
+            }
+        }
+
+        return newMatrix;
+
     }
 
 }

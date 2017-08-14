@@ -5,28 +5,75 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <TextView
-        android:id="@+id/tv_message_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/grey"
-        android:text="Messages"
-        android:textColor="@color/white"
-        android:textAlignment="center"
-        android:gravity="center"
-        android:paddingTop="3dp"
-        android:paddingBottom="3dp"
-        android:textStyle="bold"/>
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/root_view">
 
-    <!-- Message ListView -->
-    <ListView
-        android:id="@+id/lv_messages"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        android:layout_below="@id/tv_message_header"
-        android:divider="@null"
-        android:stackFromBottom="true"
-        android:transcriptMode="alwaysScroll"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tv_message_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/grey"
+                android:text="Messages"
+                android:textColor="@color/white"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:textStyle="bold"/>
+
+            <!-- Message ListView -->
+            <ListView
+                android:id="@+id/lv_messages"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:layout_below="@id/tv_message_header"
+                android:divider="@null"
+                android:stackFromBottom="true"
+                android:transcriptMode="alwaysScroll"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_message_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/grey_overlay"
+            android:visibility="gone">
+
+            <TextView
+                android:paddingTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:background="@color/grey_overlay"
+                android:textColor="@color/white"
+                android:textSize="36dp"
+                android:text="Got Message!"/>
+
+            <ImageView
+                android:id="@+id/iv_message_overlay"
+                android:layout_marginTop="0dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/demo_one_large"
+                />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </RelativeLayout>

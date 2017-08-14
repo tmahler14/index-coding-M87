@@ -125,5 +125,27 @@ public class Matrix {
         return arrayToReturn;
     }
 
+    public void setMatrixFromIndices(Matrix m, int[] indices) {
+
+        for (int i = 0; i < m.rowSize; i++) {
+
+            for (int j = 0; j < indices.length; j++) {
+                this.vals[i][indices[j]] = m.vals[i][j];
+            }
+
+        }
+
+    }
+
+    public String rowToString(int r) {
+        String s = "";
+
+        for (int i = 0; i < this.colSize; i++) {
+            s += Integer.toString((int)this.vals[r][i]);
+        }
+
+        return s;
+    }
+
 }
 

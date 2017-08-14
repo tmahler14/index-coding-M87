@@ -32,6 +32,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,7 +43,9 @@ import com.m87.sam.R;
 import com.m87.sam.ui.fragment.NeighborsFragment;
 import com.m87.sam.ui.pojos.BasicAlgoTest;
 import com.m87.sam.ui.pojos.ChatMessage;
+import com.m87.sam.ui.pojos.FinalDemoTest;
 import com.m87.sam.ui.pojos.GaussianElimination;
+import com.m87.sam.ui.pojos.GreedyColoring;
 import com.m87.sam.ui.pojos.IndexCoding;
 import com.m87.sam.ui.pojos.IndexCodingMessage;
 import com.m87.sam.ui.pojos.M87ProximityDevice;
@@ -94,6 +98,8 @@ public class HomeActivity extends AppCompatActivity {
     private AlertDialog m87InitDialog;
     private AlertDialog m87SdkDisabledDialog;
 
+    public ImageView messageOverlay;
+
     private boolean mNoAccessibility;
 
     private SparseArray<ProximityMessage> msgList = new SparseArray<ProximityMessage>();
@@ -113,6 +119,7 @@ public class HomeActivity extends AppCompatActivity {
     // Tests
     public boolean testRunning = false;
     public BasicAlgoTest basicTest;
+    public FinalDemoTest demoTest;
     public ReceiverHandler receiverHandler;
 
     //**************************************************************************************************
@@ -294,8 +301,8 @@ public class HomeActivity extends AppCompatActivity {
             Logger.debug("Receive Msg Entry: sourceProximityEntryId(%d) destinationProximityEntryId(%d) msg(%s)",
                     obj.getSourceProximityEntryId(), obj.getDestinationProximityEntryId(), obj.getMessage());
 
-            Toast msg = Toast.makeText(getApplicationContext(), "Msg received: "+obj.getMessage(), Toast.LENGTH_SHORT);
-            msg.show();
+//            Toast msg = Toast.makeText(getApplicationContext(), "Msg received: "+obj.getMessage(), Toast.LENGTH_SHORT);
+//            msg.show();
 
             addChatMessage(new ChatMessage(obj.getSourceProximityEntryId(), obj.getDestinationProximityEntryId(), obj.getMessage(), true));
 
@@ -307,7 +314,13 @@ public class HomeActivity extends AppCompatActivity {
 
             if (!customControls.isTransmitter && obj.getMessage().contains("test_init")) {
                 testRunning = true;
-                receiverHandler = new ReceiverHandler(HomeActivity.this);
+
+                if (obj.getMessage().contains("basic")) {
+                    receiverHandler = new ReceiverHandler(HomeActivity.this, 0);
+                }
+                else if (obj.getMessage().contains("demo")) {
+                    receiverHandler = new ReceiverHandler(HomeActivity.this, 1);
+                }
             }
 
             if (testRunning) {
@@ -323,6 +336,9 @@ public class HomeActivity extends AppCompatActivity {
                         // Handle basic test
                         if (customControls.testType == 0) {
                             basicTest.handleMessage(message);
+                        }
+                        else {
+                            demoTest.handleMessage(message);
                         }
                     } else {
                         receiverHandler.handleMessage(message);
@@ -1197,14 +1213,44 @@ public class HomeActivity extends AppCompatActivity {
 
         startM87();
 
-//        double[][] matrix = { {1,0,0,0,0,1,0,0,0,0}, {0,1,0,0,0,0,1,0,0,0}, {0,1,1,0,0,0,0,1,0,0} };
-//        GaussianElimination.printMatrix(GaussianElimination.run(matrix));
+        double[][] matrix = { {1,0,0,0,0,1,0,0,0,0}, {0,1,0,0,0,0,1,0,0,0}, {0,1,1,0,0,0,0,1,0,0} };
+        GaussianElimination.printMatrix(GaussianElimination.run(matrix));
 
         double[][] matrix2 = { {1,0,0,1,0}, {0,0,1,0,0}, {0,1,0,0,1}, {0,0,1,1,0}, {1,1,0,0,0} };
         Matrix m = new Matrix(matrix2);
         m.show();
         Matrix m2 = IndexCoding.reduceMatrix(m);
         m2.show();
+
+//        double[][] matrix3 = {
+//                {0,0,1,1,0,1,1,1,1,1},
+//                {1,0,1,1,1,1,1,1,1,1},
+//                {1,1,0,1,0,1,1,1,1,1},
+//                {1,1,1,0,1,1,0,1,1,1},
+//                {0,0,0,1,0,1,1,0,1,1},
+//                {1,1,1,1,1,0,1,1,1,1},
+//                {1,1,1,1,1,1,0,1,1,1},
+//                {1,1,1,1,1,1,1,0,1,1},
+//                {1,1,1,1,0,1,1,1,0,1},
+//                {1,1,1,1,1,1,1,1,1,0}
+//        };
+        double[][] matrix3 = {
+                {0,1,1,1,1,1,1,1,1,1},
+                {1,0,1,1,1,1,1,1,0,1},
+                {1,1,0,1,1,1,1,1,1,1},
+                {1,1,1,0,1,1,0,1,1,1},
+                {1,0,1,0,0,1,1,1,1,1},
+                {1,1,1,1,0,0,1,1,1,0},
+                {1,1,1,1,1,1,0,1,1,0},
+                {1,1,0,1,1,1,1,0,0,1},
+                {1,0,1,1,1,1,1,1,0,1},
+                {1,1,1,0,1,0,1,1,1,0}
+        };
+        Matrix m3 = new Matrix(matrix3);
+
+        GreedyColoring gc = new GreedyColoring();
+        gc.greedyColoring(m3);
+
 
         //Logger.debug(IndexCodingMessage.parseMessage("TX.1.4.0.1.4.78").toString());
 
@@ -1387,10 +1433,45 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void startFinalDemoTest() {
+
+        messageOverlay = (ImageView) findViewById(R.id.iv_message_overlay);
+
         // Show toast
         Toast msg = Toast.makeText(getApplicationContext(), "Starting final demo test", Toast.LENGTH_SHORT);
         msg.show();
 
+        testRunning = true;
+        demoTest = new FinalDemoTest(this.getApplicationContext(), this);
+        demoTest.run();
+
+    }
+
+    public void showImageViewLayout() {
+        LinearLayout overlay = (LinearLayout) findViewById(R.id.ll_message_overlay);
+        messageOverlay = (ImageView) findViewById(R.id.iv_message_overlay);
+
+        if (Controls.getInstance().deviceLabel.contains("1")){
+            messageOverlay.setImageResource(R.drawable.demo_one_large);
+        }
+        else if (Controls.getInstance().deviceLabel.contains("2")){
+            messageOverlay.setImageResource(R.drawable.demo_two_large);
+        }
+        else if (Controls.getInstance().deviceLabel.contains("3")){
+            messageOverlay.setImageResource(R.drawable.demo_three_large);
+        }
+        else {
+            messageOverlay.setImageResource(R.drawable.demo_four_large);
+        }
+
+
+        overlay.setVisibility(View.VISIBLE);
+
+        overlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                overlay.setVisibility(View.GONE);
+            }
+        });
 
     }
 

@@ -20,7 +20,7 @@
         android:paddingTop="5dp"
         android:text="Sample"
         android:textColor="@color/white"
-        android:textSize="18dp" />
+        android:textSize="14dp" />
 
     <TextView
         android:id="@+id/msgr_info"
@@ -37,6 +37,6 @@
         android:paddingTop="7.5dp"
         android:text="5:45 PM"
         android:textColor="@color/dark_grey"
-        android:textSize="12dp" />
+        android:textSize="9dp" />
 
 </RelativeLayout>

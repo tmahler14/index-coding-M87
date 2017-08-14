@@ -2,11 +2,13 @@ package com.m87.sam.ui.pojos;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Created by tim-azul on 8/10/17.
@@ -33,7 +35,7 @@ public class FileReader {
         return bytes;
     }
 
-    public static byte[] readVideoFile2(String path) {
+    public static byte[] readFile2(String path) {
         File file = new File(path);
         int size = (int) file.length();
         byte bytes[] = new byte[size];
@@ -70,7 +72,18 @@ public class FileReader {
         return bytes;
     }
 
-    public static void writeVideoFile(byte[] fileBytes, String fileName) {
+    public static byte[] convertResStreamToByteArray(InputStream is) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buff = new byte[10240];
+        int i = Integer.MAX_VALUE;
+        while ((i = is.read(buff, 0, buff.length)) > 0) {
+            baos.write(buff, 0, i);
+        }
+
+        return baos.toByteArray(); // be sure to close InputStream in calling function
+    }
+
+    public static void writeFile(byte[] fileBytes, String fileName) {
         BufferedOutputStream bos = null;
         try {
             bos = new BufferedOutputStream(new FileOutputStream(fileName));

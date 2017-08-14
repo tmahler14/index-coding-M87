@@ -34,6 +34,7 @@
     <color name="block_grey">#FFbfbfbf</color>
 
     <color name="grey">#FFC6C6C6</color>
+    <color name="grey_overlay">#F3C6C6C6</color>
 
     <!--Green-->
     <color name="green">#FF8ac442</color>

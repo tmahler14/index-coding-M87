@@ -1,19 +1,26 @@
 package com.m87.sam.ui.pojos;
 
-
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.m87.sam.R;
 import com.m87.sam.ui.activity.HomeActivity;
 import com.m87.sam.ui.activity.HomeFragment;
 import com.m87.sam.ui.util.Logger;
 
-import java.lang.reflect.Array;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class BasicAlgoTest extends Thread {
+import static com.m87.sam.ui.pojos.FileReader.convertResStreamToByteArray;
+
+/**
+ * Created by tim-azul on 8/13/17.
+ */
+
+public class FinalDemoTest extends Thread {
     public Context context;
     public HomeActivity activity;
     public int numReceivers;
@@ -22,32 +29,34 @@ public class BasicAlgoTest extends Thread {
     public ArrayList<IndexCodingMessage> initMessageList = new ArrayList<IndexCodingMessage>();
     public ArrayList<IndexCodingMessage> round1MessageList = new ArrayList<>();
     public ArrayList<IndexCodingMessage> successMessages = new ArrayList<>();
-    public ArrayList<Message> testMessages = new ArrayList<Message>();
+    public ArrayList<DemoMessage> testMessages = new ArrayList<DemoMessage>();
     public int[] retransmissionDevices;
 
     public Matrix entireMatrix;
     public int[] diags;
     public Matrix reducedMatrix;
 
-    public static int MESSAGE_SIZE = 4;
+    public int MESSAGE_SIZE = 4;
 
-    public BasicAlgoTest(Context context, HomeActivity activity){
+    public FinalDemoTest(Context context, HomeActivity activity){
         this.context = context;
         this.activity = activity;
         this.numReceivers = HomeFragment.neighborList.size() - 1;
     }
 
     // Message containing both the device and actual binary message
-    public class Message {
+    public class DemoMessage {
 
         public M87ProximityDevice device;
         public String binaryMessage;
-        public boolean isOriginalMsg;
+        public int byteMsgIndex;
+        public byte[] byteMessageArr;
+        public String lastHexMessage;
 
-        public Message(M87ProximityDevice d, String bm, boolean isOriginalMsg) {
+        public DemoMessage(M87ProximityDevice d, byte[] a) {
             this.device = d;
-            this.binaryMessage = bm;
-            this.isOriginalMsg = isOriginalMsg;
+            this.byteMessageArr = a;
+            this.byteMsgIndex = 0;
         }
 
         @Override
@@ -94,14 +103,14 @@ public class BasicAlgoTest extends Thread {
     public void sendInitMessages() {
         Logger.debug("TEST: Sending init messages");
 
-        Toast msg = Toast.makeText(this.context, "Sending init messages", Toast.LENGTH_SHORT);
+        Toast msg = Toast.makeText(this.context, "DEMO: Sending init messages", Toast.LENGTH_SHORT);
         msg.show();
 
         for (int i = 0; i < HomeFragment.neighborList.size(); i++) {
             Logger.debug("TEST: Neighbor = "+HomeFragment.neighborList.get(i).getId());
 
             if (!HomeFragment.neighborList.get(i).isSelf()) {
-                IndexCodingMessage initMessage = IndexCodingMessage.buildInitMessage(HomeFragment.neighborList.get(i).getId(), 0);
+                IndexCodingMessage initMessage = IndexCodingMessage.buildInitMessage(HomeFragment.neighborList.get(i).getId(), 1);
                 messageList.add(initMessage);
                 activity.newMsg(initMessage.destinationDevice.id, initMessage.fullMessage);
             }
@@ -146,9 +155,19 @@ public class BasicAlgoTest extends Thread {
 
         successMessages.add(m);
 
+        // Resend messages
         if (hasReceivedAllSuccessMessages()) {
-            Toast msg = Toast.makeText(this.context, "Test DONE", Toast.LENGTH_SHORT);
-            msg.show();
+
+            int status = sendNewMessageBatch();
+
+            if (status <= 0) {
+                Toast msg = Toast.makeText(this.context, "Test DONE", Toast.LENGTH_LONG);
+                msg.show();
+
+                sendTestDoneMessages();
+
+            }
+
         }
 
     }
@@ -184,19 +203,19 @@ public class BasicAlgoTest extends Thread {
         Logger.debug("retransmissionDevices");
         Logger.debug(Arrays.toString(retransmissionDevices));
 
-        int[] originalMessages = new int[retransmissionMatrix.colSize];
+        String[] originalMessages = new String[retransmissionMatrix.colSize];
 
         for (int i = 0; i < retransmissionDevices.length; i++) {
-            Message m = getMessageGivenDeviceIndex(retransmissionDevices[i]);
+            DemoMessage m = getMessageGivenDeviceIndex(retransmissionDevices[i]);
             Logger.debug("MESSAGE14");
             Logger.debug(m.toString());
-            originalMessages[i] = Integer.parseInt(m.binaryMessage, 2);
+            originalMessages[i] = m.lastHexMessage;
         }
 
         Logger.debug("ORIGINAL");
         Logger.debug(Arrays.toString(originalMessages));
 
-        int[] retransmissionMessages = IndexCoding.constructRetransmissionMessages(retransmissionMatrix, originalMessages);
+        String[] retransmissionMessages = IndexCoding.constructRetransmissionMessagesHex(retransmissionMatrix, originalMessages);
 
         Logger.debug("R MESSAGES");
         Logger.debug(Arrays.toString(retransmissionMessages));
@@ -204,13 +223,13 @@ public class BasicAlgoTest extends Thread {
         // Send retransmission messages
         Logger.debug("TEST sending retransmission messages");
         for (int i = 0; i < retransmissionDevices.length; i++) {
-            Message msg = getMessageGivenDeviceIndex(retransmissionDevices[i]);
+            DemoMessage msg = getMessageGivenDeviceIndex(retransmissionDevices[i]);
 
             // Send each retransmission device
             for (int j = 0; j < retransmissionMessages.length; j++) {
                 IndexCodingMessage m = IndexCodingMessage.buildTestMessage(msg.device.getId());
                 m.roundType = IndexCodingMessage.ROUND_RETRANSMITTION_FINAL;
-                m.messageString = Integer.toString(retransmissionMessages[j], 16);
+                m.messageString = retransmissionMessages[j];
                 m.messageSize = MESSAGE_SIZE;
                 m.destinationDeviceIdx = msg.device.getDeviceIdx();
                 m.numDevices = this.numReceivers;
@@ -227,8 +246,8 @@ public class BasicAlgoTest extends Thread {
 
     }
 
-    public Message getMessageGivenDeviceIndex(int index) {
-        Message m = null;
+    public DemoMessage getMessageGivenDeviceIndex(int index) {
+        DemoMessage m = null;
         for (int i = 0; i < testMessages.size(); i++) {
             if (testMessages.get(i).device.deviceIdx == index) {
                 return testMessages.get(i);
@@ -241,30 +260,6 @@ public class BasicAlgoTest extends Thread {
         return round1MessageList.size() == this.numReceivers;
     }
 
-    public String createTestMessages(boolean isOriginalMsg) {
-        // Generate test messages composed of binary strings
-        for (int i = 0; i < initMessageList.size(); i++) {
-
-            // Make sure not self
-            if (!initMessageList.get(i).sourceDevice.isSelf()) {
-                Message m = new Message(initMessageList.get(i).sourceDevice, IndexCodingMessage.generateRandomBinaryMessage(MESSAGE_SIZE), isOriginalMsg);
-                Logger.debug("TEST Message --> "+m.toString());
-                testMessages.add(m);
-            }
-        }
-
-        // Build total message
-        String totalMessage = "";
-        for (int i = 0; i < testMessages.size(); i++) {
-            totalMessage += testMessages.get(i).binaryMessage;
-        }
-
-        Logger.debug("TEST Total Message");
-        Logger.debug(totalMessage);
-
-        return totalMessage;
-    }
-
     public void startTest() {
 
         Logger.debug("TEST Start test");
@@ -274,16 +269,56 @@ public class BasicAlgoTest extends Thread {
         Toast msg = Toast.makeText(this.context, "Init received, starting test", Toast.LENGTH_SHORT);
         msg.show();
 
-        // Create test messages
-        String finalMessage = createTestMessages(true);
+        // For each init message, read in image file
+        for (int i = 0; i < initMessageList.size(); i++) {
+            byte [] a = getDeviceFile(initMessageList.get(i).sourceDevice.label);
+
+            Logger.debug("GOT BYTES");
+            Logger.debug(Arrays.toString(a));
+            Logger.debug("Length");
+            Logger.debug(Integer.toString(a.length));
+
+            DemoMessage x = new DemoMessage(initMessageList.get(i).sourceDevice, a);
+            testMessages.add(x);
+        }
+
+        sendNewMessageBatch();
+
+
+    }
+
+    public int sendNewMessageBatch() {
+        int numBytesPerMessage = 200;
+
         entireMatrix = new Matrix(this.numReceivers, this.numReceivers);
+        round1MessageList = new ArrayList<>();
+        successMessages = new ArrayList<>();
+
+        // Create message
+        String finalStr = "";
+        for (int i = 0; i < testMessages.size(); i++) {
+            DemoMessage z = testMessages.get(i);
+
+            String hex = "";
+            for (int j = 0; j < numBytesPerMessage/2; j++) {
+                if (z.byteMsgIndex >= z.byteMessageArr.length) {
+                    return -1;
+                } else {
+                    hex += String.format("%02X", z.byteMessageArr[z.byteMsgIndex++]);
+                }
+            }
+
+            z.lastHexMessage = hex;
+
+            finalStr += hex;
+        }
 
         Logger.debug("TEST sending test messages");
         for (int i = 0; i < testMessages.size(); i++) {
             IndexCodingMessage m = IndexCodingMessage.buildTestMessage(testMessages.get(i).device.getId());
             m.roundType = IndexCodingMessage.ROUND_FIRST;
-            m.messageString = IndexCodingMessage.binaryToHex(finalMessage);
-            m.messageSize = 1;
+            m.messageString = finalStr;
+            m.messageSize = numBytesPerMessage;
             m.destinationDeviceIdx = testMessages.get(i).device.getDeviceIdx();
             m.numDevices = this.numReceivers;
 
@@ -294,5 +329,50 @@ public class BasicAlgoTest extends Thread {
             activity.newMsg(testMessages.get(i).device.getId(), m.fullMessage);
         }
 
+        return 1;
+    }
+
+    public void sendTestDoneMessages(){
+        for (int i = 0; i < testMessages.size(); i++) {
+            IndexCodingMessage m = IndexCodingMessage.buildTestMessage(testMessages.get(i).device.getId());
+            m.roundType = IndexCodingMessage.ROUND_TEST_DONE;
+            m.messageString = "1";
+            m.messageSize = 1;
+            m.destinationDeviceIdx = testMessages.get(i).device.getDeviceIdx();
+            m.numDevices = this.numReceivers;
+
+            m.fullMessage = m.buildTestFullMessage();
+
+            Logger.debug("TEST message --> "+m.toString());
+            Logger.debug(m.fullMessage);
+            activity.newMsg(testMessages.get(i).device.getId(), m.fullMessage);
+        }
+    }
+
+    public byte[] getDeviceFile(String deviceLabel) {
+
+        InputStream inStream;
+
+        if (deviceLabel.contains("1")){
+            inStream = context.getResources().openRawResource(R.raw.demo_one_small);
+        }
+        else if (deviceLabel.contains("2")){
+            inStream = context.getResources().openRawResource(R.raw.demo_two_small);
+        }
+        else if (deviceLabel.contains("3")){
+            inStream = context.getResources().openRawResource(R.raw.demo_three_small);
+        }
+        else {
+            inStream = context.getResources().openRawResource(R.raw.demo_four_small);
+        }
+
+        byte[] arr = new byte[]{};
+        try {
+            arr = FileReader.convertResStreamToByteArray(inStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            return arr;
+        }
     }
 }
